@@ -1,0 +1,21 @@
+{
+  "name": "dvb-verbindungsauskunft",
+  "version": "1.0.0",
+  "description": "Findet Verbindungen der DVB.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "author": "josh skeen",
+  "license": "ISC",
+  "dependencies": {
+    "alexa-app": "^2.3.2",
+    "chai": "^3.5.0",
+    "chai-as-promised": "^5.2.0",
+    "dvbjs": "^4.2.1",
+    "lodash": "^4.3.0",
+    "mocha": "^2.4.5",
+    "moment": "^2.17.1",
+    "request-promise": "^2.0.0"
+  }
+}
