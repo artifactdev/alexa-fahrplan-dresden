@@ -29,13 +29,13 @@ app.intent('Verbindungsauskunft', {
     var time;
 
     time = new Date();
-    if (!_.isEmpty(time)) {
-        console.log("aktuelle zeit")
-    } else {
-        console.log(timeSlot);
-        //time = new Date();
-        //time.setTime(timeSlot);
+    time.setHours(time.getHours()+1);
+
+    if (!_.isEmpty(timeSlot)) {
+        var timeArray = timeSlot.split(':');
+        time.setHours(timeArray[0],timeArray[1],0,0);
     }
+
 
     if (_.isEmpty(startStation) || _.isEmpty(destinationStation)) {
       var prompt = 'Ich habe habe eine der Haltestellen nicht verstanden.';
@@ -46,29 +46,66 @@ app.intent('Verbindungsauskunft', {
 
         dvb.route(startStation, destinationStation, time, deparr, function(err, data) {
             if (err) throw err;
-            //console.log(JSON.stringify(data, null, 4));
+
             var result = JSON.stringify(data, null, 4);
             var tripsArray = JSON.parse(result);
             var tripsLength = tripsArray.trips.length;
-            //console.log(data);
+
+            var mode;
+            var line;
+            var direction;
+            var departure;
+            var departureTime;
+            var arrival;
+            var arrivalTime;
+
             for (var i = 0; i < tripsLength; i++) {
                 var trips = getTrips(tripsArray, i);
-                var mode = trips.mode;
-                var line = trips.line;
-                var direction = trips.direction;
-                direction = direction.replace(/"/g, '');
-                var departure = trips.departure.stop;
-                var departureTime = trips.departure.time;
-                var arrival = trips.arrival.stop;
-                var arrivalTime = trips.arrival.time;
-                if (mode === "Fussweg") {
-                    return;
+
+                console.log("trips length" + trips.length);
+                if (trips.length === 1) {
+                    mode = trips[0].mode;
+                    line = trips[0].line;
+                    direction = trips[0].direction;
+                    direction = direction.replace(/"/g, '');
+                    departure = trips[0].departure.stop;
+                    departureTime = trips[0].departure.time;
+                    arrival = trips[0].arrival.stop;
+                    arrivalTime = trips[0].arrival.time;
+                    if (mode === "Fussweg") {
+                        return;
+                    } else {
+                        console.log("Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunfszeit " + arrivalTime + " Uhr.");
+                        result = "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunfszeit " + arrivalTime + " Uhr.";
+                        res.say(result).send();
+                    }
                 } else {
-                    //console.log(mode, line, departure, departureTime,arrival, arrivalTime);
-                    console.log("Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunfszeit " + arrivalTime + " Uhr." );
-                    var result = "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunfszeit " + arrivalTime + " Uhr.";
-                    res.say(result).send();
+                    for (var i2 = 0; i2 < trips.length; i2++) {
+                        mode = trips[i2].mode;
+                        line = trips[i2].line;
+                        direction = trips[i2].direction;
+                        direction = direction.replace(/"/g, '');
+                        departure = trips[i2].departure.stop;
+                        departureTime = trips[i2].departure.time;
+                        arrival = trips[i2].arrival.stop;
+                        arrivalTime = trips[i2].arrival.time;
+
+                        if (i2 === 0) {
+                            console.log(trips[i2].departure.stop, trips[i2].arrival.stop, "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunft an der Haltestelle " + arrival + ' um ' + arrivalTime + " Uhr.");
+                            result = "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunft an der Haltestelle " + arrival + ' um ' + arrivalTime + " Uhr.";
+                        } else {
+                            console.log(trips[i2].departure.stop, trips[i2].arrival.stop, "Danach "+ departureTime + " Uhr, weiter mit " + mode + " der Linie " + line + " Richtung " + direction + " ist die Ankunft am Ziel " + arrival + ' um ' + arrivalTime + " Uhr.");
+                            result = "Danach "+ departureTime + " Uhr, weiter mit " + mode + " der Linie " + line + " Richtung " + direction + ". Die Ankunft am Ziel " + arrival + ' ist um ' + arrivalTime + " Uhr.";
+                        }
+
+                        res.say(result).send();
+                    }
+                    return;
+
+
                 }
+
+
             }
 
             res.say("Das war es.").shouldEndSession(true);
@@ -155,9 +192,14 @@ app.intent('Abfahrtsmonitor', {
 function getTrips(data, i) {
     var tmp = JSON.stringify(data.trips[i].nodes);
     tmp = JSON.parse(tmp);
-    tmp = JSON.stringify(tmp);
-    tmp = JSON.parse(tmp);
-    return tmp[0];
+    var nodesLength = tmp.length;
+    var tmpArray = [];
+    for (var i = 0; i < tmp.length; i++) {
+        tmpArray.push(tmp[i]);
+    }
+    tmpArray = JSON.stringify(tmpArray, null, 4);
+    tmpArray = JSON.parse(tmpArray);
+    return tmpArray;
 }
 
 //hack to support custom utterances in utterance expansion string
