@@ -7,7 +7,7 @@ var moment = require('moment');
 var app = new Alexa.app('fahrplan-dresden');
 
 app.launch(function(req, res) {
-  var prompt = 'Verbindungsauskunft & Abfahrtsmonitor.';
+  var prompt = 'Was kann ich für dich tun?';
   res.say(prompt).reprompt(prompt).shouldEndSession(false);
 });
 
@@ -15,7 +15,7 @@ app.intent('Verbindungsauskunft', {
   'slots': {
     'STARTSTATION': 'STATIONS',
     'DESTINATIONSTATION': 'STATIONS',
-    'TIME': 'AMAZON.time'
+    'TIME': 'AMAZON.TIME'
   },
   'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} {|um} {-|TIME}']
 },
@@ -120,7 +120,7 @@ app.intent('Abfahrtsmonitor', {
   'slots': {
     'STATION': 'STATIONS',
     'RESULTS': 'RESULTCOUNT',
-    'OFFSET': 'OFFSETMINUTES'
+    'OFFSET': 'AMAZON.TIME'
   },
   'utterances': ['{|Die} {-|RESULTS} {|nächsten} {|Fahrten} von {-|STATION}']
 },
