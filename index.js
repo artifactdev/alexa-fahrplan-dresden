@@ -46,9 +46,16 @@ app.intent('Verbindungsauskunft', {
 
         dvb.route(startStation, destinationStation, time, deparr, function(err, data) {
             if (err) throw err;
-
             var result = JSON.stringify(data, null, 4);
             var tripsArray = JSON.parse(result);
+
+            if (tripsArray === null) {
+                prompt = 'Ich kann keine Ergebnisse für diese Fahrt finden.';
+                console.log(prompt);
+                res.say(prompt).shouldEndSession(true);
+                return;
+            }
+
             var tripsLength = tripsArray.trips.length;
 
             var mode;
