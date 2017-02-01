@@ -87,19 +87,7 @@ app.intent('Abfahrtsmonitor', {
     var timeOffset = req.slot('OFFSET');
     var reprompt = 'Sage mir eine Haltestelle.';
 
-    stationCode = stationCode.toString();
-    stationCode = stationCode.toLowerCase();
-    stationCode = stationCode.replace(/ä/g, 'ae');
-    stationCode = stationCode.replace(/ö/g, 'oe');
-    stationCode = stationCode.replace(/ü/g, 'ue');
-    stationCode = stationCode.replace(/ß/g, 'ss');
-    stationCode = stationCode.replace(/ /g, '-');
-    stationCode = stationCode.replace(/\./g, '');
-    stationCode = stationCode.replace(/,/g, '');
-    stationCode = stationCode.replace(/\(/g, '');
-    stationCode = stationCode.replace(/\)/g, '');
-    stationCode = stationCode.replace(/ /g, '');
-
+    //stationcode = dvbHelperInstance.stringReplacer(stationCode);
 
     if (_.isEmpty(numResults)) {
         numResults = 3;
@@ -117,26 +105,7 @@ app.intent('Abfahrtsmonitor', {
         dvb.monitor(stationCode, timeOffset, numResults, function(err, data) {
             if (err) throw err;
             //console.log(JSON.stringify(data, null, 4));
-            var zeit;
-            var result;
-            var length = data.length;
-            for (var i = 0; i < length; i++) {
-                zeit = moment(data[i].arrivalTime, "x").locale("de").fromNow();
-
-                if (length <= 0 ||(i + 1) === length) {
-
-                    //console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit );
-
-                    result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit;
-                } else {
-
-                    //console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und');
-
-                    result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und';
-                }
-                res.say(result).send();
-                console.log(result);
-            }
+            getStationInfo(res, data);
         });
 
       return false;
@@ -161,7 +130,7 @@ function connectionSingleTrip(res, trips) {
         result = "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunfszeit " + arrivalTime + " Uhr.";
         res.say(result).send();
     }
-};
+}
 
 function connectionMultipleTrips(res, s, trips) {
     var result;
@@ -183,6 +152,29 @@ function connectionMultipleTrips(res, s, trips) {
     }
 
     res.say(result).send();
+}
+
+function getStationInfo(res, data) {
+    var zeit;
+    var result;
+    var length = data.length;
+    for (var i = 0; i < length; i++) {
+        zeit = moment(data[i].arrivalTime, "x").locale("de").fromNow();
+
+        if (length <= 0 ||(i + 1) === length) {
+
+            //console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit );
+
+            result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit;
+        } else {
+
+            //console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und');
+
+            result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und';
+        }
+        res.say(result).send();
+        console.log(result);
+    }
 }
 
 //hack to support custom utterances in utterance expansion string

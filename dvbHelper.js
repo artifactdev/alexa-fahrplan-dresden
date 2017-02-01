@@ -29,6 +29,22 @@ var dvbHelper = function (){
        tmpArray = JSON.parse(tmpArray);
        return tmpArray;
    };
+
+   self.stringReplacer = function (string) {
+       string = string.toString();
+       string = string.toLowerCase();
+       string = string.replace(/ä/g, 'ae');
+       string = string.replace(/ö/g, 'oe');
+       string = string.replace(/ü/g, 'ue');
+       string = string.replace(/ß/g, 'ss');
+       string = string.replace(/ /g, '-');
+       string = string.replace(/\./g, '');
+       string = string.replace(/,/g, '');
+       string = string.replace(/\(/g, '');
+       string = string.replace(/\)/g, '');
+       string = string.replace(/ /g, '');
+       return string;
+   }
 };
 
 module.exports = dvbHelper;
