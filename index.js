@@ -120,6 +120,10 @@ app.intent('Abfahrtsmonitor', {
   }
 );
 
+app.error = function(exception, request, response) {
+    response.say("Sorry, da ist etwas schief gelaufen");
+};
+
 function connectionSingleTrip(res, trips) {
     var result;
     var cardText;
