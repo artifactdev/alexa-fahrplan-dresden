@@ -16,13 +16,13 @@ app.launch(function(req, res) {
   res.say(prompt).reprompt(prompt).shouldEndSession(false);
 });
 
-app.intent('Verbindungsauskunft Zeit', {
+app.intent('Verbindungsauskunft', {
   'slots': {
     'STARTSTATION': 'STATIONS',
     'DESTINATIONSTATION': 'STATIONS',
     'TIME': 'AMAZON.TIME'
   },
-  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} um {-|TIME}']
+  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} {|um} {-|TIME}']
 },
   function(req, res) {
     //get the slot
@@ -201,6 +201,8 @@ app.intent('Abfahrtsmonitor', {
             dvbHelperInstance.cardCreator(res, cardContent);
             res.say(resultObject[0]);
         });
+
+      return false;
     }
   }
 );
