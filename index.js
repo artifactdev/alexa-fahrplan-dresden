@@ -121,7 +121,8 @@ app.intent('Abfahrtsmonitor', {
         dvb.monitor(stationCode, timeOffset, numResults, function(err, data) {
             if (err) throw err;
             //console.log(JSON.stringify(data, null, 4));
-            getStationInfo(res, data);
+            var result = dvbHelperInstance.getStationInfo(res, data);
+            res.say(result);
         });
 
       return false;
@@ -132,30 +133,6 @@ app.intent('Abfahrtsmonitor', {
 app.error = function(exception, request, response) {
     response.say("Sorry, da ist etwas schief gelaufen");
 };
-
-
-function getStationInfo(res, data) {
-    var zeit;
-    var result;
-    var length = data.length;
-    for (var i = 0; i < length; i++) {
-        zeit = moment(data[i].arrivalTime, "x").locale("de").fromNow();
-
-        if (length <= 0 ||(i + 1) === length) {
-
-            console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit );
-
-            result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit;
-        } else {
-
-            console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und');
-
-            result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und';
-        }
-        res.say(result).send();
-        //console.log(result);
-    }
-}
 
 //hack to support custom utterances in utterance expansion string
 console.log(app.utterances().replace(/\{\-\|/g, '{'));

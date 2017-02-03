@@ -119,6 +119,28 @@ var dvbHelper = function (){
            return [result, cardArray];
        }
    };
+
+   self.getStationInfo = function (res, data) {
+       var zeit;
+       var result;
+       var length = data.length;
+       for (var i = 0; i < length; i++) {
+           zeit = moment(data[i].arrivalTime, "x").locale("de").fromNow();
+
+           if (length <= 0 ||(i + 1) === length) {
+
+               console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit );
+
+               result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit;
+           } else {
+
+               console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und');
+
+               result =  result + 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und';
+           }
+       }
+       return result;
+   };
 };
 
 module.exports = dvbHelper;
