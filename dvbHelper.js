@@ -1,6 +1,7 @@
 /*jslint node: true */ /*global define */
 var _ = require('lodash');
 var moment = require('moment');
+var momentTimezone = require('moment-timezone');
 var cardArray = [];
 var responseArray = [];
 
@@ -9,16 +10,14 @@ var dvbHelper = function (){
    console.log('dvbHelper');
 
    self.getTime = function (timeSlot){
+       console.log('getTime');
        var time = new Date();
-       time.setHours(time.getHours()+1);
-       console.log(time, timeSlot);
 
        if (!_.isEmpty(timeSlot)) {
-           console.log("timeSlot is empty");
            var timeArray = timeSlot.split(':');
            time.setHours(timeArray[0],timeArray[1],0,0);
        }
-       console.log(time);
+       time = moment.tz(time, "Europe/Berlin").toDate();
        return time;
    };
 
@@ -56,7 +55,7 @@ var dvbHelper = function (){
        string = string.toString;
        string = string.replace(/undefinded/g, '');
        return string;
-   }
+   };
 
    self.cardObjectHelper = function (title, cardArray) {
        var cardContent = '';
@@ -80,7 +79,7 @@ var dvbHelper = function (){
        var mode = trips[s].mode;
        var line = trips[s].line;
        var direction = trips[s].direction;
-       var direction = direction.replace(/"/g, '');
+           direction = direction.replace(/"/g, '');
        var departure = trips[s].departure.stop;
        var departureTime = trips[s].departure.time;
        var arrival = trips[s].arrival.stop;
@@ -105,7 +104,7 @@ var dvbHelper = function (){
        var mode = trips[0].mode;
        var line = trips[0].line;
        var direction = trips[0].direction;
-       direction = direction.replace(/"/g, '');
+           direction = direction.replace(/"/g, '');
        var departure = trips[0].departure.stop;
        var departureTime = trips[0].departure.time;
        var arrival = trips[0].arrival.stop;

@@ -5,6 +5,7 @@ var _ = require('lodash');
 var Alexa = require('alexa-app');
 var dvb = require('dvbjs');
 var moment = require('moment');
+var momentTimezone = require('moment-timezone');
 var dvbHelper = require('./dvbHelper.js');
 var app = new Alexa.app('fahrplan-dresden');
 var dvbHelperInstance = new dvbHelper();
@@ -38,7 +39,6 @@ app.intent('Verbindungsauskunft', {
     } else {
         var deparr = dvb.route.DEPARTURE; // set to dvb.route.DEPARTURE for the time to be the departure time, dvb.route.ARRIVAL for arrival time
 
-        console.log(time, timeSlot);
         dvb.route(startStation, destinationStation, time, deparr, function(err, data) {
             if (err) throw err;
             var result = JSON.stringify(data, null, 4);
