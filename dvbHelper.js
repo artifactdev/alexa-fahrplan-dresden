@@ -7,12 +7,14 @@ var dvbHelper = function (){
    self.getTime = function (timeSlot){
        var time = new Date();
        time.setHours(time.getHours()+1);
+       console.log(time, timeSlot);
 
        if (!_.isEmpty(timeSlot)) {
+           console.log("timeSlot is empty");
            var timeArray = timeSlot.split(':');
            time.setHours(timeArray[0],timeArray[1],0,0);
        }
-
+       console.log(time);
        return time;
    };
 
@@ -44,7 +46,29 @@ var dvbHelper = function (){
        string = string.replace(/\)/g, '');
        string = string.replace(/ /g, '');
        return string;
+   };
+
+   self.removeUndefined = function (string) {
+       string = string.toString;
+       string = string.replace(/undefinded/g, '');
+       return string;
    }
+
+   self.cardObjectHelper = function (title, cardArray) {
+       var cardContent = '';
+       for (var i = 0; i < cardArray.length; i++) {
+           cardContent = cardContent + cardArray[i] + '\n';
+       }
+       return {
+          type: "Simple",
+          title: title,
+          content: cardContent,
+      };
+  };
+
+   self.cardCreator = function (response, dataObject) {
+       response.card(dataObject);
+   };
 };
 
 module.exports = dvbHelper;
