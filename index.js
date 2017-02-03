@@ -65,6 +65,7 @@ app.intent('Verbindungsauskunft', {
                         console.log(resultObject[0]);
                     }
                 } else {
+                    dvbHelperInstance.resetCardArray();
                     for (var s = 0; s < trips.length; s++) {
                         resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips);
                         if (resultObject !== undefined) {
@@ -120,9 +121,11 @@ app.intent('Abfahrtsmonitor', {
     } else {
         dvb.monitor(stationCode, timeOffset, numResults, function(err, data) {
             if (err) throw err;
-            //console.log(JSON.stringify(data, null, 4));
-            var result = dvbHelperInstance.getStationInfo(res, data);
-            res.say(result);
+
+            var resultObject = dvbHelperInstance.getStationInfo(res, data);
+            var cardContent = dvbHelperInstance.cardObjectHelper(stationCode + ' Abfahrten ',resultObject[1]);
+            dvbHelperInstance.cardCreator(res, cardContent);
+            res.say(resultObject[0]);
         });
 
       return false;

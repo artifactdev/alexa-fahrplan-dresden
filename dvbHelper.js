@@ -109,6 +109,9 @@ var dvbHelper = function (){
        var departureTime = trips[0].departure.time;
        var arrival = trips[0].arrival.stop;
        var arrivalTime = trips[0].arrival.time;
+
+       self.resetCardArray();
+
        if (mode === "Fussweg") {
            return;
        } else {
@@ -125,6 +128,8 @@ var dvbHelper = function (){
        var zeit;
        var result;
        var length = data.length;
+       self.resetCardArray();
+
        for (var i = 0; i < length; i++) {
            zeit = moment(data[i].arrivalTime, "x").locale("de").fromNow();
 
@@ -133,14 +138,22 @@ var dvbHelper = function (){
                console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit );
 
                result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit;
+               cardText = 'Linie ' + data[i].line + ' Richtung ' + data[i].direction + ' in ' +  zeit + '.' + '\n';
+               cardArray.push(cardText);
            } else {
 
                console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und');
 
                result =  result + 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und';
+               cardText = 'Linie ' + data[i].line + ' Richtung ' + data[i].direction + ' in ' +  zeit + '.' + '\n';
+               cardArray.push(cardText);
            }
        }
-       return result;
+       return [result, cardArray];
+   };
+
+   self.resetCardArray = function() {
+       cardArray = [];
    };
 };
 
