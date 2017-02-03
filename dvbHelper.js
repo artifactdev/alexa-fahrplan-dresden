@@ -9,6 +9,16 @@ var dvbHelper = function (){
    var self = this;
    console.log('dvbHelper');
 
+   self.getDuration = function (timeSlot){
+       var currentTime = new moment();
+       var duration = moment.duration(timeSlot);
+       var futureDate = currentTime.add(duration);
+
+
+       var time = moment.tz(futureDate, "Europe/Berlin").toDate();
+       return time;
+   };
+
    self.getTime = function (timeSlot){
        var time = new Date();
 

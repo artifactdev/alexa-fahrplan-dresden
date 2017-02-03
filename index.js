@@ -16,13 +16,13 @@ app.launch(function(req, res) {
   res.say(prompt).reprompt(prompt).shouldEndSession(false);
 });
 
-app.intent('Verbindungsauskunft', {
+app.intent('Verbindungsauskunft Zeit', {
   'slots': {
     'STARTSTATION': 'STATIONS',
     'DESTINATIONSTATION': 'STATIONS',
     'TIME': 'AMAZON.TIME'
   },
-  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} {|um} {-|TIME}']
+  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} um {-|TIME}']
 },
   function(req, res) {
     //get the slot
@@ -89,13 +89,87 @@ app.intent('Verbindungsauskunft', {
  }
 );
 
+app.intent('Verbindungsauskunft Minuten', {
+  'slots': {
+    'STARTSTATION': 'STATIONS',
+    'DESTINATIONSTATION': 'STATIONS',
+    'TIME': 'AMAZON.DURATION'
+  },
+  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} in {-|TIME}']
+},
+  function(req, res) {
+    //get the slot
+    var timeSlot = req.slot('TIME'); // starting at what time
+    var time = dvbHelperInstance.getDuration(timeSlot);
+    var startStation = req.slot('STARTSTATION');
+    var destinationStation = req.slot('DESTINATIONSTATION');
+    var reprompt = 'Sage mir eine Haltestelle und die Zielhaltestelle und wann es losgehen soll.';
+
+    if (_.isEmpty(startStation) || _.isEmpty(destinationStation)) {
+      var prompt = 'Ich habe habe eine der Haltestellen nicht verstanden.';
+      res.say(prompt).reprompt(reprompt).shouldEndSession(false);
+      return true;
+    } else {
+        var deparr = dvb.route.DEPARTURE; // set to dvb.route.DEPARTURE for the time to be the departure time, dvb.route.ARRIVAL for arrival time
+
+        dvb.route(startStation, destinationStation, time, deparr, function(err, data) {
+            if (err) throw err;
+            var result = JSON.stringify(data, null, 4);
+            var tripsArray = JSON.parse(result);
+
+            if (tripsArray === null) {
+                prompt = 'Ich kann keine Ergebnisse für diese Fahrt finden.';
+                res.say(prompt).shouldEndSession(false);
+                return;
+            }
+
+            var tripsLength = tripsArray.trips.length;
+            var resultObject = [];
+
+            for (var i = 0; i < tripsLength; i++) {
+                var trips = dvbHelperInstance.getTrips(tripsArray, i);
+
+                if (trips.length === 1) {
+                    resultObject = dvbHelperInstance.connectionSingleTrip(res, trips);
+                    if (resultObject !== undefined) {
+                        var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation, resultObject[1]);
+                        dvbHelperInstance.cardCreator(res, cardContent);
+                        res.say(resultObject[0]).send();
+                        console.log(resultObject[0]);
+                    }
+                } else {
+                    dvbHelperInstance.resetCardArray();
+                    for (var s = 0; s < trips.length; s++) {
+                        resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips);
+                        if (resultObject !== undefined) {
+                            res.say(resultObject[0]).send();
+                            console.log(resultObject[0]);
+                        }
+                    }
+                    var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation,resultObject[1]);
+                    dvbHelperInstance.cardCreator(res, cardContent);
+                    return;
+                }
+
+
+            }
+
+            res.say("Das war es.").shouldEndSession(true);
+
+        });
+      return false;
+    }
+ }
+);
+
+
 app.intent('Abfahrtsmonitor', {
   'slots': {
     'STATION': 'STATIONS',
     'RESULTS': 'RESULTCOUNT',
     'OFFSET': 'AMAZON.TIME'
   },
-  'utterances': ['{|Die} {-|RESULTS} {|nächsten} {|Fahrten} von {-|STATION}']
+  'utterances': ['{|Die} {-|RESULTS} {|nächsten} {|Fahrten} {|von} {-|STATION}']
 },
   function(req, res) {
     //get the slot
