@@ -1,4 +1,6 @@
 var _ = require('lodash');
+var cardArray = [];
+var responseArray = [];
 
 var dvbHelper = function (){
    var self = this;
@@ -68,6 +70,54 @@ var dvbHelper = function (){
 
    self.cardCreator = function (response, dataObject) {
        response.card(dataObject);
+   };
+
+   self.connectionMultipleTrips = function (res, s, trips) {
+       var result;
+       var cardText;
+       var mode = trips[s].mode;
+       var line = trips[s].line;
+       var direction = trips[s].direction;
+       var direction = direction.replace(/"/g, '');
+       var departure = trips[s].departure.stop;
+       var departureTime = trips[s].departure.time;
+       var arrival = trips[s].arrival.stop;
+       var arrivalTime = trips[s].arrival.time;
+
+       if (s === 0) {
+           console.log(trips[s].departure.stop, trips[s].arrival.stop, "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunft an der Haltestelle " + arrival + ' um ' + arrivalTime + " Uhr.");
+           result = "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunft an der Haltestelle " + arrival + ' um ' + arrivalTime + " Uhr.";
+           cardText = mode + ' Linie ' + line + ' Richtung ' + direction + '\n' +  departureTime + ' → ' + arrivalTime + '\n';
+       } else {
+           console.log(trips[s].departure.stop, trips[s].arrival.stop, "Danach "+ departureTime + " Uhr, weiter mit " + mode + " der Linie " + line + " Richtung " + direction + " ist die Ankunft am Ziel " + arrival + ' um ' + arrivalTime + " Uhr.");
+           result = "Danach "+ departureTime + " Uhr, weiter mit " + mode + " der Linie " + line + " Richtung " + direction + ". Die Ankunft am Ziel " + arrival + ' ist um ' + arrivalTime + " Uhr.";
+           cardText = mode + ' Linie ' + line + ' Richtung ' + direction + '\n' +  departureTime + ' → ' + arrivalTime + '\n';
+       }
+       cardArray.push(cardText);
+       return [result, cardArray];
+   };
+
+   self.connectionSingleTrip = function (res, trips) {
+       var result;
+       var cardText;
+       var mode = trips[0].mode;
+       var line = trips[0].line;
+       var direction = trips[0].direction;
+       direction = direction.replace(/"/g, '');
+       var departure = trips[0].departure.stop;
+       var departureTime = trips[0].departure.time;
+       var arrival = trips[0].arrival.stop;
+       var arrivalTime = trips[0].arrival.time;
+       if (mode === "Fussweg") {
+           return;
+       } else {
+           console.log("Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunfszeit " + arrivalTime + " Uhr.");
+           result = "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunfszeit " + arrivalTime + " Uhr.";
+
+           cardText = mode + ' Linie ' + line + ' Richtung ' + direction + '\n' +  departureTime + ' → ' + arrivalTime + '\n';
+           cardArray.push(cardText);
+           return [result, cardArray];
+       }
    };
 };
 
