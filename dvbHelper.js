@@ -1,3 +1,4 @@
+/*jslint node: true */ /*global define */
 var _ = require('lodash');
 var moment = require('moment');
 var cardArray = [];

@@ -1,4 +1,4 @@
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50, node: true */ /*global define */
+/*jslint node: true */ /*global define */
 'use strict';
 module.change_code = 1;
 var _ = require('lodash');
