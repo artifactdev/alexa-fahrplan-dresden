@@ -104,6 +104,9 @@ app.intent('Abfahrtsmonitor', {
     var timeOffset = req.slot('OFFSET');
     var reprompt = 'Sage mir eine Haltestelle.';
 
+    console.log('Has Session', req.hasSession());
+    req.getSession().set("results", 3);
+
     //stationcode = dvbHelperInstance.stringReplacer(stationCode);
 
     if (_.isEmpty(numResults)) {
@@ -127,8 +130,7 @@ app.intent('Abfahrtsmonitor', {
             dvbHelperInstance.cardCreator(res, cardContent);
             res.say(resultObject[0]);
         });
-
-      return false;
+        console.log('Session', req.getSession());
     }
   }
 );
