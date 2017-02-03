@@ -10,7 +10,6 @@ var dvbHelper = function (){
    console.log('dvbHelper');
 
    self.getTime = function (timeSlot){
-       console.log('getTime');
        var time = new Date();
 
        if (!_.isEmpty(timeSlot)) {
