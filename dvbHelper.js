@@ -1,7 +1,6 @@
 /*jslint node: true */ /*global define */
 var _ = require('lodash');
-var moment = require('moment');
-var momentTimezone = require('moment-timezone');
+moment = require('moment');
 var cardArray = [];
 var responseArray = [];
 
@@ -9,7 +8,7 @@ var dvbHelper = function (){
    var self = this;
    console.log('dvbHelper');
 
-   self.getDuration = function (timeSlot){
+   /*self.getDuration = function (timeSlot){
        var currentTime = new moment();
        var duration = moment.duration(timeSlot);
        var futureDate = currentTime.add(duration);
@@ -17,7 +16,7 @@ var dvbHelper = function (){
 
        var time = moment.tz(futureDate, "Europe/Berlin").toDate();
        return time;
-   };
+   };*/
 
    self.getTime = function (timeSlot){
        var time = new Date();
@@ -26,7 +25,7 @@ var dvbHelper = function (){
            var timeArray = timeSlot.split(':');
            time.setHours(timeArray[0],timeArray[1],0,0);
        }
-       time = moment.tz(time, "Europe/Berlin").toDate();
+       //time = moment.tz(time, "Europe/Berlin").toDate();
        return time;
    };
 
@@ -131,34 +130,6 @@ var dvbHelper = function (){
            cardArray.push(cardText);
            return [result, cardArray];
        }
-   };
-
-   self.getStationInfo = function (res, data) {
-       var zeit;
-       var result;
-       var length = data.length;
-       self.resetCardArray();
-
-       for (var i = 0; i < length; i++) {
-           zeit = moment(data[i].arrivalTime, "x").locale("de").fromNow();
-
-           if (length <= 0 ||(i + 1) === length) {
-
-               console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit );
-
-               result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit;
-               cardText = 'Linie ' + data[i].line + ' Richtung ' + data[i].direction + ' in ' +  zeit + '.' + '\n';
-               cardArray.push(cardText);
-           } else {
-
-               console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und');
-
-               result =  result + 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und';
-               cardText = 'Linie ' + data[i].line + ' Richtung ' + data[i].direction + ' in ' +  zeit + '.' + '\n';
-               cardArray.push(cardText);
-           }
-       }
-       return [result, cardArray];
    };
 
    self.resetCardArray = function() {
