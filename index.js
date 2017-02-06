@@ -105,7 +105,7 @@ app.intent('Verbindungsauskunft Minuten', {
     var reprompt = 'Sage mir eine Haltestelle und die Zielhaltestelle und wann es losgehen soll.';
 
     if (_.isEmpty(startStation) || _.isEmpty(destinationStation)) {
-      var prompt = 'Ich habe habe eine der Haltestellen nicht verstanden.';
+      var prompt = 'Ich habe habe eine der Haltestellen nicht verstanden. Versuche es nochmal.';
       res.say(prompt).reprompt(reprompt).shouldEndSession(false);
       return true;
     } else {

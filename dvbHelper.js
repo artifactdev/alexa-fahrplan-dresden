@@ -8,15 +8,16 @@ var dvbHelper = function (){
    var self = this;
    console.log('dvbHelper');
 
-   /*self.getDuration = function (timeSlot){
+   self.getDuration = function (timeSlot){
        var currentTime = new moment();
        var duration = moment.duration(timeSlot);
        var futureDate = currentTime.add(duration);
 
 
        var time = moment.tz(futureDate, "Europe/Berlin").toDate();
+       console.log(currentTime, time);
        return time;
-   };*/
+   };
 
    self.getTime = function (timeSlot){
        var time = new Date();
@@ -25,6 +26,7 @@ var dvbHelper = function (){
            var timeArray = timeSlot.split(':');
            time.setHours(timeArray[0],timeArray[1],0,0);
        }
+       console.log(time);
        //time = moment.tz(time, "Europe/Berlin").toDate();
        return time;
    };
