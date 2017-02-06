@@ -9,14 +9,23 @@ var dvbHelper = function (){
    var self = this;
    console.log('dvbHelper');
 
+   /**
+    * Set a time based on a given duration in minutes
+    * @param  {[int]} timeSlot a given number which defines the minutes
+    * @return {[date]} returns a date object
+    */
    self.getDuration = function (timeSlot){
        var currentTime = moment().tz("Europe/Berlin");
        var returned_endate = moment(currentTime).add(timeSlot, 'minutes').add('1', 'hours');
 
-       console.log(currentTime, returned_endate);
        return moment(returned_endate).toDate();
    };
 
+   /**
+    * Gets time by a timeslot
+    * @param  {[string]} timeSlot hours and minutes devided by :
+    * @return {[date]} returns a date object
+    */
    self.getTime = function (timeSlot){
        var time = new Date();
 
@@ -24,12 +33,15 @@ var dvbHelper = function (){
            var timeArray = timeSlot.split(':');
            time.setHours(timeArray[0],timeArray[1],0,0);
        }
-       console.log(time);
-       //time = moment.tz(time, "Europe/Berlin").toDate();
        return time;
    };
 
-   // Gets all the tripinfos from Array
+   /**
+    * Get all trips from multiple trips array
+    * @param  {[json]} data the data of trips
+    * @param  {[int]} i    the number of trip which data should be returned
+    * @return {[json]}      The JSON of the defined trip
+    */
    self.getTrips = function(data, i) {
        var tmp = JSON.stringify(data.trips[i].nodes);
        tmp = JSON.parse(tmp);
@@ -43,6 +55,11 @@ var dvbHelper = function (){
        return tmpArray;
    };
 
+   /**
+    * Replaces umlauts
+    * @param  {[string]} string the string where the replacement should happen
+    * @return {[string]}  the replaced string
+    */
    self.stringReplacer = function (string) {
        string = string.toString();
        string = string.toLowerCase();
@@ -59,12 +76,12 @@ var dvbHelper = function (){
        return string;
    };
 
-   self.removeUndefined = function (string) {
-       string = string.toString;
-       string = string.replace(/undefinded/g, '');
-       return string;
-   };
-
+   /**
+    * The cardObjectHelper creates a cardObject
+    * @param  {[string]} title     the title of the card
+    * @param  {[object]} cardArray with the text of the card
+    * @return {[object]}           a cardObject
+    */
    self.cardObjectHelper = function (title, cardArray) {
        var cardContent = '';
        for (var i = 0; i < cardArray.length; i++) {
@@ -77,10 +94,16 @@ var dvbHelper = function (){
       };
   };
 
+   /**
+    * Creates a card
+    * @param  {[event]} response   the event response
+    * @param  {[object]} dataObject a cardObject
+    */
    self.cardCreator = function (response, dataObject) {
        response.card(dataObject);
    };
 
+   // TODO
    self.connectionMultipleTrips = function (res, s, trips) {
        var result;
        var cardText;
