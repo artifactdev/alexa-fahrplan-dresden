@@ -61,7 +61,6 @@ app.intent('Verbindungsauskunft', {
                         var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation, resultObject[1]);
                         dvbHelperInstance.cardCreator(res, cardContent);
                         res.say(resultObject[0]).send();
-                        console.log(resultObject[0]);
                     }
                 } else {
                     dvbHelperInstance.resetCardArray();
@@ -69,7 +68,6 @@ app.intent('Verbindungsauskunft', {
                         resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips);
                         if (resultObject !== undefined) {
                             res.say(resultObject[0]).send();
-                            console.log(resultObject[0]);
                         }
                     }
                     var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation,resultObject[1]);
@@ -116,7 +114,6 @@ app.intent('VerbindungsauskunftMinuten', {
         dvb.route(startStation, destinationStation, duration, deparr, function(err, data) {
             if (err) throw err;
             var result = JSON.stringify(data, null, 4);
-            console.log(result);
             var tripsArray = JSON.parse(result);
 
             if (tripsArray === null) {
@@ -221,6 +218,12 @@ app.intent('Abfahrtsmonitor', {
     }
   }
 );
+
+app.sessionEnded(function(request, response) {
+  // cleanup the user's server-side session
+  response.say('Ich hoffe ich konnte helfen.');
+  // no response required
+});
 
 
 app.error = function(exception, request, response) {

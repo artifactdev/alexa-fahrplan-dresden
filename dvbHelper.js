@@ -15,10 +15,11 @@ var dvbHelper = function (){
     * @return {[date]} returns a date object
     */
    self.getDuration = function (timeSlot){
-       var currentTime = moment().tz("Europe/Berlin");
-       var returned_endate = moment(currentTime).add(timeSlot, 'minutes').add('1', 'hours');
+       var currentTime = moment().add(1, 'hours').add(timeSlot, 'minutes');
+       console.log('TIMESLOT: ' +  timeSlot);
+       console.log('CURRENT TIME: ' + currentTime.toDate());
 
-       return moment(returned_endate).toDate();
+       return currentTime.toDate();
    };
 
    /**
@@ -31,7 +32,7 @@ var dvbHelper = function (){
 
        if (!_.isEmpty(timeSlot)) {
            var timeArray = timeSlot.split(':');
-           time.setHours(timeArray[0],timeArray[1],0,0);
+           time.setHours(timeArray[0],timeArray[1] - 15,0,0);
        }
        return time;
    };
