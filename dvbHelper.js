@@ -134,6 +134,41 @@ var dvbHelper = function (){
        }
    };
 
+   self.getStationInfo = function (res, data) {
+       var zeit;
+       var result;
+       var length = data.length;
+       var resultArray = [];
+       for (var i = 0; i < length; i++) {
+           zeit = moment(data[i].arrivalTime, "x").locale("de").fromNow();
+
+           if (length === 0 || (i + 1) === length) {
+
+               console.log( 'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ' + zeit );
+
+               result =  'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ' + zeit;
+
+               resultArray.push(result);
+           } else {
+
+               console.log( 'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ' + zeit + ' und ');
+
+               result =  'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ' + zeit + ' und ';
+               resultArray.push(result);
+           }
+       }
+       return resultArray;
+   };
+
+   self.getRightStationName = function (name) {
+       name = name.toString();
+       name = name.replace(/Hp./g, 'Haltepunkt');
+       name = name.replace(/Industriegeb./g, 'Industriegebiet');
+       name = name.replace(/Pennrich/g, 'Penrich');
+       name = name.replace(/Reick/g, 'Reik');
+       return name;
+   };
+
    self.resetCardArray = function() {
        cardArray = [];
    };

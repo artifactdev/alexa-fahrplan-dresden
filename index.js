@@ -173,58 +173,46 @@ app.intent('Abfahrtsmonitor', {
   function(req, res) {
     //get the slot
     var stationCode = req.slot('STATION');
-    //var numResults = req.slot('RESULTS');
+    var numResults = req.slot('RESULTS');
     var timeOffset = req.slot('OFFSET');
     var reprompt = 'Sage mir eine Haltestelle.';
+    var result;
 
     //stationcode = dvbHelperInstance.stringReplacer(stationCode);
 
-    /*if (_.isEmpty(numResults)) {
+    if (_.isEmpty(numResults)) {
         numResults = 3;
     }
 
     if (_.isEmpty(timeOffset)) {
         timeOffset = 0;
-    }*/
+    }
 
     if (_.isEmpty(stationCode)) {
       var prompt = 'Ich habe die Haltestelle nicht verstanden. Versuche es nochmal.';
       res.say(prompt).shouldEndSession(false);
       return true;
     } else {
-        dvb.monitor(stationCode, timeOffset, 0, function(err, data) {
+        dvb.monitor(stationCode, timeOffset, numResults, function(err, data) {
             if (err) throw err;
 
-            getStationInfo(res, data);
+            result = dvbHelperInstance.getStationInfo(res, data);
+            var resultText = '';
+
+            if (result !== undefined) {
+                for (var i = 0; i < result.length; i++) {
+                    resultText = resultText + result[i];
+                }
+                console.log(resultText);
+                res.say(resultText).send();
+            }
+
         });
 
       return false;
     }
   }
 );
-
-function getStationInfo(res, data) {
-    var zeit;
-    var result;
-    var length = data.length;
-    for (var i = 0; i < length; i++) {
-        zeit = moment(data[i].arrivalTime, "x").locale("de").fromNow();
-
-        if (length <= 0 ||(i + 1) === length) {
-
-            console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit );
-
-            result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit;
-        } else {
-
-            console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und');
-
-            result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und';
-        }
-        res.say(result).send();
-        //console.log(result);
-    }
-}
 
 
 app.error = function(exception, request, response) {
