@@ -199,15 +199,25 @@ app.intent('Abfahrtsmonitor', {
         dvb.monitor(stationCode, timeOffset, numResults, function(err, data) {
             if (err) throw err;
 
-            result = dvbHelperInstance.getStationInfo(res, data);
+            var resultObject = dvbHelperInstance.getStationInfo(res, data);
+            var result = resultObject[0];
+            var cardResult = resultObject[1];
             var resultText = '';
+            var cardText = '';
 
             if (result !== undefined) {
                 for (var i = 0; i < result.length; i++) {
                     resultText = resultText + result[i];
                 }
-                console.log(resultText);
+
+                for (var i = 0; i < cardResult.length; i++) {
+                    cardText = cardText + cardResult[i];
+                }
+
+                console.log(cardText);
                 res.say(resultText).send();
+                var cardContent = dvbHelperInstance.cardObjectHelper('Abfahrten ' + ' → ' + stationCode ,cardText);
+                dvbHelperInstance.cardCreator(res, cardContent);
             }
 
         });

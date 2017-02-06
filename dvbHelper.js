@@ -145,17 +145,22 @@ var dvbHelper = function (){
                console.log( 'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ' + zeit );
 
                result =  'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ' + zeit;
+               cardText = 'Linie ' + data[i].line + ' Richtung ' + data[i].direction + ' → ' +  zeit + '\n\n';
+               cardArray.push(cardText);
 
                resultArray.push(result);
            } else {
 
-               console.log( 'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ' + zeit + ' und ');
+               console.log( 'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ');
 
                result =  'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ' + zeit + ' und ';
+               cardText = 'Linie ' + data[i].line + ' Richtung ' + data[i].direction + ' → ' +  zeit  + '\n\n';
+               cardArray.push(cardText);
+
                resultArray.push(result);
            }
        }
-       return resultArray;
+       return [resultArray, cardArray];
    };
 
    self.getRightStationName = function (name) {
