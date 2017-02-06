@@ -201,22 +201,17 @@ app.intent('Abfahrtsmonitor', {
 
             var resultObject = dvbHelperInstance.getStationInfo(res, data);
             var result = resultObject[0];
-            var cardResult = resultObject[1];
+            var cardArray = resultObject[1];
             var resultText = '';
-            var cardText = '';
 
             if (result !== undefined) {
                 for (var i = 0; i < result.length; i++) {
                     resultText = resultText + result[i];
                 }
 
-                for (var i = 0; i < cardResult.length; i++) {
-                    cardText = cardText + cardResult[i];
-                }
 
-                console.log(cardText);
                 res.say(resultText).send();
-                var cardContent = dvbHelperInstance.cardObjectHelper('Abfahrten ' + ' → ' + stationCode ,cardText);
+                var cardContent = dvbHelperInstance.cardObjectHelper('Abfahrten ' + ' → ' + stationCode ,cardArray);
                 dvbHelperInstance.cardCreator(res, cardContent);
             }
 
