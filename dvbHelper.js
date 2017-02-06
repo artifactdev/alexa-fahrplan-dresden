@@ -1,6 +1,7 @@
 /*jslint node: true */ /*global define */
 var _ = require('lodash');
-moment = require('moment');
+//moment = require('moment');
+moment = require('moment-timezone');
 var cardArray = [];
 var responseArray = [];
 
@@ -9,14 +10,11 @@ var dvbHelper = function (){
    console.log('dvbHelper');
 
    self.getDuration = function (timeSlot){
-       var currentTime = new moment();
-       var duration = moment.duration(timeSlot);
-       var futureDate = currentTime.add(duration);
+       var currentTime = moment().tz("Europe/Berlin");
+       var returned_endate = moment(currentTime).add(timeSlot, 'minutes').add('1', 'hours');
 
-
-       var time = moment.tz(futureDate, "Europe/Berlin").toDate();
-       console.log(currentTime, time);
-       return time;
+       console.log(currentTime, returned_endate);
+       return moment(returned_endate).toDate();
    };
 
    self.getTime = function (timeSlot){

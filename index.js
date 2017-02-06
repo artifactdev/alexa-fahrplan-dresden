@@ -21,7 +21,7 @@ app.intent('Verbindungsauskunft', {
     'DESTINATIONSTATION': 'STATIONS',
     'TIME': 'AMAZON.TIME'
   },
-  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} {|um} {-|TIME}']
+  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} um {-|TIME}']
 },
   function(req, res) {
     //get the slot
@@ -88,32 +88,35 @@ app.intent('Verbindungsauskunft', {
  }
 );
 
-app.intent('Verbindungsauskunft Minuten', {
+app.intent('VerbindungsauskunftMinuten', {
   'slots': {
     'STARTSTATION': 'STATIONS',
     'DESTINATIONSTATION': 'STATIONS',
-    'TIME': 'AMAZON.DURATION'
+    'MINUTES': 'AMAZON.NUMBER'
   },
-  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} in {-|TIME}']
+  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} in {-|MINUTES} Minuten']
 },
   function(req, res) {
     //get the slot
-    var timeSlot = req.slot('TIME'); // starting at what time
-    var time = dvbHelperInstance.getDuration(timeSlot);
+    var timeSlot = req.slot('MINUTES'); // starting at what time
+    var duration = dvbHelperInstance.getDuration(timeSlot);
     var startStation = req.slot('STARTSTATION');
     var destinationStation = req.slot('DESTINATIONSTATION');
     var reprompt = 'Sage mir eine Haltestelle und die Zielhaltestelle und wann es losgehen soll.';
 
-    if (_.isEmpty(startStation) || _.isEmpty(destinationStation)) {
-      var prompt = 'Ich habe habe eine der Haltestellen nicht verstanden. Versuche es nochmal.';
+    if (_.isEmpty(startStation) || _.isEmpty(destinationStation) || _.isEmpty(timeSlot)) {
+      var prompt = 'Ich habe habe nicht alles verstanden. Versuche es nochmal.';
       res.say(prompt).reprompt(reprompt).shouldEndSession(false);
       return true;
     } else {
         var deparr = dvb.route.DEPARTURE; // set to dvb.route.DEPARTURE for the time to be the departure time, dvb.route.ARRIVAL for arrival time
 
-        dvb.route(startStation, destinationStation, time, deparr, function(err, data) {
+        console.log('Datestring: ' + duration);
+
+        dvb.route(startStation, destinationStation, duration, deparr, function(err, data) {
             if (err) throw err;
             var result = JSON.stringify(data, null, 4);
+            console.log(result);
             var tripsArray = JSON.parse(result);
 
             if (tripsArray === null) {
@@ -165,7 +168,7 @@ app.intent('Verbindungsauskunft Minuten', {
 app.intent('Abfahrtsmonitor', {
   'slots': {
     'STATION': 'STATIONS',
-    'RESULTS': 'RESULTCOUNT',
+    'RESULTS': 'AMAZON.NUMBER',
     'OFFSET': 'AMAZON.TIME'
   },
   'utterances': ['{|Die} {-|RESULTS} {|nächsten} {|Fahrten} {|von} {-|STATION}']
