@@ -11,7 +11,7 @@ var dvbHelperInstance = new dvbHelper();
 var cardArray = [];
 
 app.launch(function(req, res) {
-  var prompt = 'Was kann ich für dich tun?';
+  var prompt = 'Frage nach Abfahrten oder Verbindungen.';
   res.say(prompt).reprompt(prompt).shouldEndSession(false);
 });
 
