@@ -21,7 +21,7 @@ app.intent('Verbindungsauskunft', {
     'DESTINATIONSTATION': 'STATIONS',
     'TIME': 'AMAZON.TIME'
   },
-  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} um {-|TIME}']
+  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} um {-|TIME}', 'nach Verbindung von {-|STARTSTATION} nach {-|DESTINATIONSTATION} um {-|TIME}']
 },
   function(req, res) {
     //get the slot
@@ -91,7 +91,7 @@ app.intent('VerbindungsauskunftMinuten', {
     'DESTINATIONSTATION': 'STATIONS',
     'MINUTES': 'AMAZON.NUMBER'
   },
-  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} in {-|MINUTES} Minuten']
+  'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} in {-|MINUTES} Minuten', 'nach Verbindung von {-|STARTSTATION} nach {-|DESTINATIONSTATION} in {-|MINUTES} Minuten']
 },
   function(req, res) {
     //get the slot
@@ -161,7 +161,7 @@ app.intent('Abfahrtsmonitor', {
     'RESULTS': 'AMAZON.NUMBER',
     'OFFSET': 'AMAZON.TIME'
   },
-  'utterances': ['{|Die} {-|RESULTS} {|nächsten} {|Fahrten} {|von} {-|STATION}']
+  'utterances': ['{|Die} {-|RESULTS} {|nächsten} {|Abfahrten|Fahrten} {|von} {-|STATION}', 'nach {|Abfahrten|Fahrten} von {-|STATION}', 'nach den {-|RESULTS} nächsten {|Abfahrten|Fahrten} von {-|STATION}']
 },
   function(req, res) {
     //get the slot
