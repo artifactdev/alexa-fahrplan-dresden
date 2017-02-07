@@ -30,6 +30,7 @@ app.intent('Verbindungsauskunft', {
     var startStation = req.slot('STARTSTATION');
     var destinationStation = req.slot('DESTINATIONSTATION');
     var reprompt = 'Sage mir eine Haltestelle und die Zielhaltestelle und wann es losgehen soll.';
+    cardArray = [];
 
     if (_.isEmpty(startStation) || _.isEmpty(destinationStation)) {
       var prompt = 'Ich habe habe eine der Haltestellen nicht verstanden.';
@@ -38,17 +39,14 @@ app.intent('Verbindungsauskunft', {
     } else {
         var deparr = dvb.route.DEPARTURE; // set to dvb.route.DEPARTURE for the time to be the departure time, dvb.route.ARRIVAL for arrival time
 
-        dvb.route(startStation, destinationStation, time, deparr, function(err, data) {
-            if (typeof null === data || data === null) {
-                prompt = 'Ich kann keine Ergebnisse für diese Fahrt finden.';
-                console.log(prompt);
-                res.say(prompt).shouldEndSession(true);
-            } else {
+        dvb.route(startStation, destinationStation, time, deparr).then( function(data) {
+            if (data !== null) {
                 var result = JSON.stringify(data, null, 4);
                 var tripsArray = JSON.parse(result);
 
                 var tripsLength = tripsArray.trips.length;
                 var resultObject = [];
+
 
                 for (var i = 0; i < tripsLength; i++) {
                     var trips = dvbHelperInstance.getTrips(tripsArray, i);
@@ -76,9 +74,12 @@ app.intent('Verbindungsauskunft', {
                 dvbHelperInstance.cardCreator(res, cardContent);
 
                 res.say("Das war es.").shouldEndSession(true);
+            } else {
+                prompt = 'Ich kann keine Ergebnisse für diese Verbindung finden.';
+                res.say(prompt).send();
             }
-
         });
+
       return false;
     }
  }
@@ -99,6 +100,7 @@ app.intent('VerbindungsauskunftMinuten', {
     var startStation = req.slot('STARTSTATION');
     var destinationStation = req.slot('DESTINATIONSTATION');
     var reprompt = 'Sage mir eine Haltestelle und die Zielhaltestelle und wann es losgehen soll.';
+    cardArray = [];
 
     if (_.isEmpty(startStation) || _.isEmpty(destinationStation) || _.isEmpty(timeSlot)) {
       var prompt = 'Ich habe habe nicht alles verstanden. Versuche es nochmal.';
@@ -107,14 +109,9 @@ app.intent('VerbindungsauskunftMinuten', {
     } else {
         var deparr = dvb.route.DEPARTURE; // set to dvb.route.DEPARTURE for the time to be the departure time, dvb.route.ARRIVAL for arrival time
 
-        console.log('Datestring: ' + duration);
-
-        dvb.route(startStation, destinationStation, duration, deparr, function(err, data) {
-            if (typeof null === data || data === null) {
-                prompt = 'Ich kann keine Ergebnisse für diese Fahrt finden.';
-                console.log(prompt);
-                res.say(prompt).shouldEndSession(false);
-            } else {
+        dvb.route(startStation, destinationStation, duration, deparr).then(function (data) {
+            console.log('DATA' + data);
+            if (data !== null) {
                 var result = JSON.stringify(data, null, 4);
                 var tripsArray = JSON.parse(result);
                 var tripsLength = tripsArray.trips.length;
@@ -147,10 +144,10 @@ app.intent('VerbindungsauskunftMinuten', {
                 dvbHelperInstance.cardCreator(res, cardContent);
 
                 res.say("Das war es.").shouldEndSession(true);
+            } else {
+                prompt = 'Ich kann keine Ergebnisse für diese Verbindung finden.';
+                res.say(prompt).send();
             }
-
-
-
         });
       return false;
     }
@@ -173,6 +170,7 @@ app.intent('Abfahrtsmonitor', {
     var timeOffset = req.slot('OFFSET');
     var reprompt = 'Sage mir eine Haltestelle.';
     var result;
+    cardArray = [];
 
     //stationcode = dvbHelperInstance.stringReplacer(stationCode);
 
@@ -190,27 +188,26 @@ app.intent('Abfahrtsmonitor', {
       return true;
     } else {
 
-        dvb.monitor(stationCode, timeOffset, numResults, function(err, data) {
-            if (err) throw err;
-            cardArray = [];
-            var resultObject = dvbHelperInstance.getStationInfo(res, data);
-            var result = resultObject[0];
-                cardArray = resultObject[1];
-            var resultText = '';
-            console.log(result);
-            if (result !== undefined) {
-                for (var i = 0; i < result.length; i++) {
-                    resultText = resultText + result[i];
-                }
+        dvb.monitor(stationCode, timeOffset, numResults).then(function (data) {
+            console.log(data.length);
+            if (data.length !== 0) {
+                var resultObject = dvbHelperInstance.getStationInfo(res, data);
+                var result = resultObject[0];
+                    cardArray = resultObject[1];
+                var resultText = '';
+                if (result !== undefined) {
+                    for (var i = 0; i < result.length; i++) {
+                        resultText = resultText + result[i];
+                    }
 
-
-                if (!_.isEmpty(resultText)) {
                     res.say(resultText).send();
                     var cardContent = dvbHelperInstance.cardObjectHelper('Abfahrten ' + ' → ' + stationCode ,cardArray);
                     dvbHelperInstance.cardCreator(res, cardContent);
-                } else {
-                    res.say('Ich habe keine passende Haltestelle gefunden.');
                 }
+            } else {
+                prompt = 'Ich kann die Haltestelle nicht finden.';
+                console.log(prompt);
+                res.say(prompt).send();
             }
 
         });
