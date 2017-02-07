@@ -190,23 +190,28 @@ app.intent('Abfahrtsmonitor', {
       res.say(prompt).shouldEndSession(false);
       return true;
     } else {
+
         dvb.monitor(stationCode, timeOffset, numResults, function(err, data) {
             if (err) throw err;
-
+            cardArray = [];
             var resultObject = dvbHelperInstance.getStationInfo(res, data);
             var result = resultObject[0];
-            var cardArray = resultObject[1];
+                cardArray = resultObject[1];
             var resultText = '';
-
+            console.log(result);
             if (result !== undefined) {
                 for (var i = 0; i < result.length; i++) {
                     resultText = resultText + result[i];
                 }
 
 
-                res.say(resultText).send();
-                var cardContent = dvbHelperInstance.cardObjectHelper('Abfahrten ' + ' → ' + stationCode ,cardArray);
-                dvbHelperInstance.cardCreator(res, cardContent);
+                if (!_.isEmpty(resultText)) {
+                    res.say(resultText).send();
+                    var cardContent = dvbHelperInstance.cardObjectHelper('Abfahrten ' + ' → ' + stationCode ,cardArray);
+                    dvbHelperInstance.cardCreator(res, cardContent);
+                } else {
+                    res.say('Ich habe keine passende Haltestelle gefunden.');
+                }
             }
 
         });
@@ -216,15 +221,15 @@ app.intent('Abfahrtsmonitor', {
   }
 );
 
-app.sessionEnded(function(request, response) {
+app.sessionEnded(function(req, res) {
   // cleanup the user's server-side session
-  response.say('Ich hoffe ich konnte helfen.');
+  res.say('Ich hoffe ich konnte helfen.');
   // no response required
 });
 
 
-app.error = function(exception, request, response) {
-    response.say("Sorry, da ist etwas schief gelaufen");
+app.error = function(exception, req, res) {
+    res.say("Sorry, da ist etwas schief gelaufen");
 };
 
 //hack to support custom utterances in utterance expansion string
