@@ -39,45 +39,44 @@ app.intent('Verbindungsauskunft', {
         var deparr = dvb.route.DEPARTURE; // set to dvb.route.DEPARTURE for the time to be the departure time, dvb.route.ARRIVAL for arrival time
 
         dvb.route(startStation, destinationStation, time, deparr, function(err, data) {
-            if (err) throw err;
-            var result = JSON.stringify(data, null, 4);
-            var tripsArray = JSON.parse(result);
-
-            if (tripsArray === null) {
+            if (typeof null === data || data === null) {
                 prompt = 'Ich kann keine Ergebnisse für diese Fahrt finden.';
-                res.say(prompt).shouldEndSession(false);
-                return;
-            }
+                console.log(prompt);
+                res.say(prompt).shouldEndSession(true);
+            } else {
+                var result = JSON.stringify(data, null, 4);
+                var tripsArray = JSON.parse(result);
 
-            var tripsLength = tripsArray.trips.length;
-            var resultObject = [];
+                var tripsLength = tripsArray.trips.length;
+                var resultObject = [];
 
-            for (var i = 0; i < tripsLength; i++) {
-                var trips = dvbHelperInstance.getTrips(tripsArray, i);
+                for (var i = 0; i < tripsLength; i++) {
+                    var trips = dvbHelperInstance.getTrips(tripsArray, i);
 
-                if (trips.length === 1) {
-                    resultObject = dvbHelperInstance.connectionSingleTrip(res, trips);
-                    if (resultObject !== undefined) {
-                        res.say(resultObject[0]).send();
-                        console.log(JSON.stringify(resultObject));
-                        cardArray.push(JSON.stringify(resultObject[1]));
-                    }
-                } else {
-                    dvbHelperInstance.resetCardArray();
-                    for (var s = 0; s < trips.length; s++) {
-                        resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips);
+                    if (trips.length === 1) {
+                        resultObject = dvbHelperInstance.connectionSingleTrip(res, trips);
                         if (resultObject !== undefined) {
                             res.say(resultObject[0]).send();
                             console.log(JSON.stringify(resultObject));
                             cardArray.push(JSON.stringify(resultObject[1]));
                         }
+                    } else {
+                        dvbHelperInstance.resetCardArray();
+                        for (var s = 0; s < trips.length; s++) {
+                            resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips);
+                            if (resultObject !== undefined) {
+                                res.say(resultObject[0]).send();
+                                console.log(JSON.stringify(resultObject));
+                                cardArray.push(JSON.stringify(resultObject[1]));
+                            }
+                        }
                     }
                 }
-            }
-            var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation,cardArray);
-            dvbHelperInstance.cardCreator(res, cardContent);
+                var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation,cardArray);
+                dvbHelperInstance.cardCreator(res, cardContent);
 
-            res.say("Das war es.").shouldEndSession(true);
+                res.say("Das war es.").shouldEndSession(true);
+            }
 
         });
       return false;
