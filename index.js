@@ -58,9 +58,9 @@ app.intent('Verbindungsauskunft', {
                 if (trips.length === 1) {
                     resultObject = dvbHelperInstance.connectionSingleTrip(res, trips);
                     if (resultObject !== undefined) {
-                        var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation, resultObject[1]);
-                        dvbHelperInstance.cardCreator(res, cardContent);
                         res.say(resultObject[0]).send();
+                        console.log(JSON.stringify(resultObject));
+                        cardArray.push(JSON.stringify(resultObject[1]));
                     }
                 } else {
                     dvbHelperInstance.resetCardArray();
@@ -68,15 +68,14 @@ app.intent('Verbindungsauskunft', {
                         resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips);
                         if (resultObject !== undefined) {
                             res.say(resultObject[0]).send();
+                            console.log(JSON.stringify(resultObject));
+                            cardArray.push(JSON.stringify(resultObject[1]));
                         }
                     }
-                    var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation,resultObject[1]);
-                    dvbHelperInstance.cardCreator(res, cardContent);
-                    return;
                 }
-
-
             }
+            var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation,cardArray);
+            dvbHelperInstance.cardCreator(res, cardContent);
 
             res.say("Das war es.").shouldEndSession(true);
 
@@ -131,8 +130,8 @@ app.intent('VerbindungsauskunftMinuten', {
                 if (trips.length === 1) {
                     resultObject = dvbHelperInstance.connectionSingleTrip(res, trips);
                     if (resultObject !== undefined) {
-                        var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation, resultObject[1]);
-                        dvbHelperInstance.cardCreator(res, cardContent);
+                        cardArray.push(resultObject[1]);
+
                         res.say(resultObject[0]).send();
                         console.log(resultObject[0]);
                     }
@@ -143,15 +142,13 @@ app.intent('VerbindungsauskunftMinuten', {
                         if (resultObject !== undefined) {
                             res.say(resultObject[0]).send();
                             console.log(resultObject[0]);
+                            cardArray.push(resultObject[1]);
                         }
                     }
-                    var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation,resultObject[1]);
-                    dvbHelperInstance.cardCreator(res, cardContent);
-                    return;
                 }
-
-
             }
+            var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation, cardArray);
+            dvbHelperInstance.cardCreator(res, cardContent);
 
             res.say("Das war es.").shouldEndSession(true);
 

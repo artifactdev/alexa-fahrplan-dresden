@@ -88,6 +88,7 @@ var dvbHelper = function (){
        for (var i = 0; i < cardArray.length; i++) {
            cardContent = cardContent + cardArray[i] + '\n';
        }
+       console.log('Card Content',cardContent);
        return {
           type: "Simple",
           title: title,
