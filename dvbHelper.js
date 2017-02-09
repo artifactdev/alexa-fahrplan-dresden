@@ -1,6 +1,7 @@
 /*jslint node: true */ /*global define */
 var _ = require('lodash');
-moment = require('moment');
+//moment = require('moment');
+moment = require('moment-timezone');
 var cardArray = [];
 var responseArray = [];
 
@@ -8,28 +9,40 @@ var dvbHelper = function (){
    var self = this;
    console.log('dvbHelper');
 
-   /*self.getDuration = function (timeSlot){
-       var currentTime = new moment();
-       var duration = moment.duration(timeSlot);
-       var futureDate = currentTime.add(duration);
+   /**
+    * Set a time based on a given duration in minutes
+    * @param  {[int]} timeSlot a given number which defines the minutes
+    * @return {[date]} returns a date object
+    */
+   self.getDuration = function (timeSlot){
+       var currentTime = moment().add(1, 'hours').add(timeSlot, 'minutes');
+       console.log('TIMESLOT: ' +  timeSlot);
+       console.log('CURRENT TIME: ' + currentTime.toDate());
 
+       return currentTime.toDate();
+   };
 
-       var time = moment.tz(futureDate, "Europe/Berlin").toDate();
-       return time;
-   };*/
-
+   /**
+    * Gets time by a timeslot
+    * @param  {[string]} timeSlot hours and minutes devided by :
+    * @return {[date]} returns a date object
+    */
    self.getTime = function (timeSlot){
        var time = new Date();
 
        if (!_.isEmpty(timeSlot)) {
            var timeArray = timeSlot.split(':');
-           time.setHours(timeArray[0],timeArray[1],0,0);
+           time.setHours(timeArray[0],timeArray[1] - 15,0,0);
        }
-       //time = moment.tz(time, "Europe/Berlin").toDate();
        return time;
    };
 
-   // Gets all the tripinfos from Array
+   /**
+    * Get all trips from multiple trips array
+    * @param  {[json]} data the data of trips
+    * @param  {[int]} i    the number of trip which data should be returned
+    * @return {[json]}      The JSON of the defined trip
+    */
    self.getTrips = function(data, i) {
        var tmp = JSON.stringify(data.trips[i].nodes);
        tmp = JSON.parse(tmp);
@@ -43,6 +56,11 @@ var dvbHelper = function (){
        return tmpArray;
    };
 
+   /**
+    * Replaces umlauts
+    * @param  {[string]} string the string where the replacement should happen
+    * @return {[string]}  the replaced string
+    */
    self.stringReplacer = function (string) {
        string = string.toString();
        string = string.toLowerCase();
@@ -59,17 +77,18 @@ var dvbHelper = function (){
        return string;
    };
 
-   self.removeUndefined = function (string) {
-       string = string.toString;
-       string = string.replace(/undefinded/g, '');
-       return string;
-   };
-
+   /**
+    * The cardObjectHelper creates a cardObject
+    * @param  {[string]} title     the title of the card
+    * @param  {[object]} cardArray with the text of the card
+    * @return {[object]}           a cardObject
+    */
    self.cardObjectHelper = function (title, cardArray) {
        var cardContent = '';
        for (var i = 0; i < cardArray.length; i++) {
            cardContent = cardContent + cardArray[i] + '\n';
        }
+       console.log('Card Content',cardContent);
        return {
           type: "Simple",
           title: title,
@@ -77,10 +96,16 @@ var dvbHelper = function (){
       };
   };
 
+   /**
+    * Creates a card
+    * @param  {[event]} response   the event response
+    * @param  {[object]} dataObject a cardObject
+    */
    self.cardCreator = function (response, dataObject) {
        response.card(dataObject);
    };
 
+   // TODO
    self.connectionMultipleTrips = function (res, s, trips) {
        var result;
        var cardText;
@@ -138,7 +163,46 @@ var dvbHelper = function (){
        }
    };
 
-   self.isInFuture = function(time) {
+   self.getStationInfo = function (res, data) {
+       var zeit;
+       var result;
+       var length = data.length;
+       var resultArray = [];
+       for (var i = 0; i < length; i++) {
+           zeit = moment(data[i].arrivalTime, "x").locale("de").fromNow();
+
+           if (length === 0 || (i + 1) === length) {
+
+               console.log( 'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ' + zeit );
+
+               result =  'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ' + zeit;
+               cardText = 'Linie ' + data[i].line + ' Richtung ' + data[i].direction + ' → ' +  zeit + '\n\n';
+               cardArray.push(cardText);
+
+               resultArray.push(result);
+           } else {
+
+               console.log( 'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ');
+
+               result =  'Linie ' + data[i].line + ' nach ' + self.getRightStationName(data[i].direction) + ' ' + zeit + ' und ';
+               cardText = 'Linie ' + data[i].line + ' Richtung ' + data[i].direction + ' → ' +  zeit  + '\n\n';
+               cardArray.push(cardText);
+
+               resultArray.push(result);
+           }
+       }
+       return [resultArray, cardArray];
+   };
+
+   self.getRightStationName = function (name) {
+       name = name.toString();
+       name = name.replace(/Hp./g, 'Haltepunkt');
+       name = name.replace(/Industriegeb./g, 'Industriegebiet');
+       name = name.replace(/Pennrich/g, 'Penrich');
+       name = name.replace(/Reick/g, 'Reik');
+       return name;
+   };
+ self.isInFuture = function(time) {
        var now = moment();
        var departure = new Date();
        var timeArray = time.split(':');

@@ -9,7 +9,7 @@
   "author": "josh skeen",
   "license": "ISC",
   "dependencies": {
-    "alexa-app": "^2.3.2",
+    "alexa-app": "^3.0.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
     "dvbjs": "^4.2.1",
