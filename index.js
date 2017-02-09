@@ -192,7 +192,7 @@ app.intent('Abfahrtsmonitor', {
       res.say(prompt).shouldEndSession(false);
       return true;
     } else {
-        dvb.monitor(stationCode, timeOffset, 0, function(err, data) {
+        dvb.monitor(stationCode, timeOffset, 5, function(err, data) {
             if (err) throw err;
 
             getStationInfo(res, data);
@@ -210,7 +210,7 @@ function getStationInfo(res, data) {
     for (var i = 0; i < length; i++) {
         zeit = moment(data[i].arrivalTime, "x").locale("de").fromNow();
 
-        if (length <= 0 ||(i + 1) === length) {
+        if (length <= 0 || (i + 1) === length) {
 
             console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit );
 
@@ -221,6 +221,7 @@ function getStationInfo(res, data) {
 
             result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und';
         }
+
         res.say(result).send();
         //console.log(result);
     }
