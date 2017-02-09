@@ -151,7 +151,9 @@ var dvbHelper = function (){
 
        self.resetCardArray();
 
-       if (mode === "Fussweg" || !self.isInFuture(departureTime)) {
+       var isInFuture = self.isInFuture(departureTime);
+
+       if (mode === "Fussweg" || !isInFuture) {
            return;
        } else {
            console.log("Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunfszeit " + arrivalTime + " Uhr.");
@@ -202,14 +204,18 @@ var dvbHelper = function (){
        name = name.replace(/Reick/g, 'Reik');
        return name;
    };
- self.isInFuture = function(time) {
-       var now = moment();
+
+   self.isInFuture = function(time) {
+       var now = moment().add(1, 'hours');
        var departure = new Date();
        var timeArray = time.split(':');
        departure.setHours(timeArray[0],timeArray[1],0,0);
+       console.log(now, departure);
       if ( now.isBefore(departure)) {
+          console.log('IN FUTURE FUNCTION IS TRUE');
           return true;
       } else {
+          console.log('IN FUTURE FUNCTION IS FALSE');
           return false;
       }
    };
