@@ -106,7 +106,7 @@ var dvbHelper = function (){
    };
 
    // TODO
-   self.connectionMultipleTrips = function (res, s, trips) {
+   self.connectionMultipleTrips = function (res, s, trips, time) {
        var result;
        var cardText;
        var mode = trips[s].mode;
@@ -118,7 +118,7 @@ var dvbHelper = function (){
        var arrival = trips[s].arrival.stop;
        var arrivalTime = trips[s].arrival.time;
 
-       if (self.isInFuture(departureTime)) {
+       if (self.isInFuture(departureTime, time)) {
            if (s === 0) {
                console.log(trips[s].departure.stop, trips[s].arrival.stop, "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunft an der Haltestelle " + arrival + ' um ' + arrivalTime + " Uhr.");
                result = "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunft an der Haltestelle " + arrival + ' um ' + arrivalTime + " Uhr.";
@@ -137,7 +137,7 @@ var dvbHelper = function (){
 
    };
 
-   self.connectionSingleTrip = function (res, trips) {
+   self.connectionSingleTrip = function (res, trips, time) {
        var result;
        var cardText;
        var mode = trips[0].mode;
@@ -151,7 +151,7 @@ var dvbHelper = function (){
 
        self.resetCardArray();
 
-       var isInFuture = self.isInFuture(departureTime);
+       var isInFuture = self.isInFuture(departureTime, time);
 
        if (mode === "Fussweg" || !isInFuture) {
            return;
@@ -205,13 +205,14 @@ var dvbHelper = function (){
        return name;
    };
 
-   self.isInFuture = function(time) {
-       var now = moment().add(1, 'hours');
+   self.isInFuture = function(time, wantedTime) {
+       var wantedTime = moment(wantedTime);
        var departure = new Date();
        var timeArray = time.split(':');
        departure.setHours(timeArray[0],timeArray[1],0,0);
-       console.log(now, departure);
-      if ( now.isBefore(departure)) {
+
+       console.log(wantedTime, departure);
+      if ( wantedTime.isBefore(departure)) {
           console.log('IN FUTURE FUNCTION IS TRUE');
           return true;
       } else {

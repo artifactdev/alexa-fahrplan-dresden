@@ -52,7 +52,7 @@ app.intent('Verbindungsauskunft', {
                     var trips = dvbHelperInstance.getTrips(tripsArray, i);
 
                     if (trips.length === 1) {
-                        resultObject = dvbHelperInstance.connectionSingleTrip(res, trips);
+                        resultObject = dvbHelperInstance.connectionSingleTrip(res, trips, time);
                         if (resultObject !== undefined) {
                             res.say(resultObject[0]).send();
                             console.log(JSON.stringify(resultObject));
@@ -61,7 +61,7 @@ app.intent('Verbindungsauskunft', {
                     } else {
                         dvbHelperInstance.resetCardArray();
                         for (var s = 0; s < trips.length; s++) {
-                            resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips);
+                            resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips, time);
                             if (resultObject !== undefined) {
                                 res.say(resultObject[0]).send();
                                 console.log(JSON.stringify(resultObject));
