@@ -211,22 +211,9 @@ app.intent('Abfahrtsmonitor', {
             }
 
         });
-
-        if (length <= 0 ||(i + 1) === length) {
-
-            console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit );
-
-            result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit;
-        } else {
-
-            console.log( 'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und');
-
-            result =  'Linie ' + data[i].line + ' nach ' + data[i].direction + ' ' + zeit + ' und';
-        }
-        res.say(result).send();
-        //console.log(result);
     }
-}
+});
+
 
 app.sessionEnded(function(req, res) {
   // cleanup the user's server-side session
