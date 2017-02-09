@@ -187,8 +187,6 @@ app.intent('Abfahrtsmonitor', {
       res.say(prompt).shouldEndSession(false);
       return true;
     } else {
-        dvb.monitor(stationCode, timeOffset, 0, function(err, data) {
-            if (err) throw err;
 
         dvb.monitor(stationCode, timeOffset, numResults).then(function (data) {
             console.log(data.length);
