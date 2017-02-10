@@ -187,18 +187,21 @@ app.intent('Abfahrtsmonitor', {
             console.log(data.length);
             if (data.length !== 0) {
                 var resultObject = dvbHelperInstance.getStationInfo(res, data);
-                var result       = resultObject[0];
-                    cardArray    = resultObject[1];
-                var resultText = '';
-                if (result !== undefined) {
-                    for (var i = 0; i < result.length; i++) {
-                        resultText = resultText + result[i];
-                    }
+                setTimeout(function () {
+                    console.log(resultObject[0]);
+                    var result       = resultObject[0];
+                        cardArray    = resultObject[1];
+                    var resultText = '';
+                    if (result !== undefined) {
+                        for (var i = 0; i < result.length; i++) {
+                            resultText = resultText + result[i];
+                        }
 
-                    res.say(resultText).send();
-                    var cardContent = dvbHelperInstance.cardObjectHelper('Abfahrten ' + ' → ' + stationCode ,cardArray);
-                    dvbHelperInstance.cardCreator(res, cardContent);
-                }
+                        res.say(resultText).send();
+                        var cardContent = dvbHelperInstance.cardObjectHelper('Abfahrten ' + ' → ' + stationCode ,cardArray);
+                        dvbHelperInstance.cardCreator(res, cardContent);
+                    }
+                }, 500);
             } else {
                 prompt = 'Ich kann die Haltestelle nicht finden.';
                 console.log(prompt);
@@ -206,6 +209,7 @@ app.intent('Abfahrtsmonitor', {
             }
 
         });
+        return false;
     }
 });
 
