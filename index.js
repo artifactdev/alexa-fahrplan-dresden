@@ -160,7 +160,8 @@ app.intent('Abfahrtsmonitor', {
     'STATION': 'STATIONS',
     'RESULTS': 'AMAZON.NUMBER'
   },
-  'utterances': ['{|Die} {-|RESULTS} {|nächsten} {|Abfahrten|Fahrten} {|von} {-|STATION}', 'nach {|Abfahrten|Fahrten} von {-|STATION}', 'nach den {-|RESULTS} nächsten {|Abfahrten|Fahrten} von {-|STATION}']
+  'utterances': ['{|Die} {-|RESULTS} {|nächsten} {|Abfahrten|Fahrten} {|von} {-|STATION}',
+  'nach den {-|RESULTS} nächsten {|Abfahrten|Fahrten} von {-|STATION}']
 },
   function(req, res) {
     //get the slot
