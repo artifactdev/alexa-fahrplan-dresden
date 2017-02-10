@@ -1,14 +1,14 @@
 /*jslint node: true */ /*global define */
 'use strict';
-module.change_code = 1;
-var _ = require('lodash');
-var Alexa = require('alexa-app');
-var dvb = require('dvbjs');
-var moment = require('moment');
-var dvbHelper = require('./dvbHelper.js');
-var app = new Alexa.app('fahrplan-dresden');
+module.change_code    = 1;
+var _                 = require('lodash');
+var Alexa             = require('alexa-app');
+var dvb               = require('dvbjs');
+var moment            = require('moment');
+var dvbHelper         = require('./dvbHelper.js');
+var app               = new Alexa.app('fahrplan-dresden');
 var dvbHelperInstance = new dvbHelper();
-var cardArray = [];
+var cardArray         = [];
 
 app.launch(function(req, res) {
   var prompt = 'Frage nach Abfahrten oder Verbindungen.';
@@ -25,12 +25,12 @@ app.intent('Verbindungsauskunft', {
 },
   function(req, res) {
     //get the slot
-    var timeSlot = req.slot('TIME'); // starting at what time
-    var time = dvbHelperInstance.getTime(timeSlot);
-    var startStation = req.slot('STARTSTATION');
+    var timeSlot           = req.slot('TIME'); // starting at what time
+    var time               = dvbHelperInstance.getTime(timeSlot);
+    var startStation       = req.slot('STARTSTATION');
     var destinationStation = req.slot('DESTINATIONSTATION');
-    var reprompt = 'Sage mir eine Haltestelle und die Zielhaltestelle und wann es losgehen soll.';
-    cardArray = [];
+    var reprompt           = 'Sage mir eine Haltestelle und die Zielhaltestelle und wann es losgehen soll.';
+    cardArray              = [];
 
     if (_.isEmpty(startStation) || _.isEmpty(destinationStation)) {
       var prompt = 'Ich habe habe eine der Haltestellen nicht verstanden.';
@@ -41,10 +41,10 @@ app.intent('Verbindungsauskunft', {
 
         dvb.route(startStation, destinationStation, time, deparr).then( function(data) {
             if (data !== null) {
-                var result = JSON.stringify(data, null, 4);
-                var tripsArray = JSON.parse(result);
+                var result       = JSON.stringify(data, null, 4);
+                var tripsArray   = JSON.parse(result);
 
-                var tripsLength = tripsArray.trips.length;
+                var tripsLength  = tripsArray.trips.length;
                 var resultObject = [];
 
 
@@ -95,12 +95,12 @@ app.intent('VerbindungsauskunftMinuten', {
 },
   function(req, res) {
     //get the slot
-    var timeSlot = req.slot('MINUTES'); // starting at what time
-    var duration = dvbHelperInstance.getDuration(timeSlot);
-    var startStation = req.slot('STARTSTATION');
+    var timeSlot           = req.slot('MINUTES'); // starting at what time
+    var duration           = dvbHelperInstance.getDuration(timeSlot);
+    var startStation       = req.slot('STARTSTATION');
     var destinationStation = req.slot('DESTINATIONSTATION');
-    var reprompt = 'Sage mir eine Haltestelle und die Zielhaltestelle und wann es losgehen soll.';
-    cardArray = [];
+    var reprompt           = 'Sage mir eine Haltestelle und die Zielhaltestelle und wann es losgehen soll.';
+    cardArray              = [];
 
     if (_.isEmpty(startStation) || _.isEmpty(destinationStation) || _.isEmpty(timeSlot)) {
       var prompt = 'Ich habe habe nicht alles verstanden. Versuche es nochmal.';
@@ -166,11 +166,11 @@ app.intent('Abfahrtsmonitor', {
   function(req, res) {
     //get the slot
     var stationCode = req.slot('STATION');
-    var numResults = req.slot('RESULTS');
-    var timeOffset = req.slot('OFFSET');
-    var reprompt = 'Sage mir eine Haltestelle.';
+    var numResults  = req.slot('RESULTS');
+    var timeOffset  = req.slot('OFFSET');
+    var reprompt    = 'Sage mir eine Haltestelle.';
     var result;
-    cardArray = [];
+    cardArray       = [];
 
     //stationcode = dvbHelperInstance.stringReplacer(stationCode);
 
@@ -192,8 +192,8 @@ app.intent('Abfahrtsmonitor', {
             console.log(data.length);
             if (data.length !== 0) {
                 var resultObject = dvbHelperInstance.getStationInfo(res, data);
-                var result = resultObject[0];
-                    cardArray = resultObject[1];
+                var result       = resultObject[0];
+                    cardArray    = resultObject[1];
                 var resultText = '';
                 if (result !== undefined) {
                     for (var i = 0; i < result.length; i++) {
