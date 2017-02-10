@@ -158,8 +158,7 @@ app.intent('VerbindungsauskunftMinuten', {
 app.intent('Abfahrtsmonitor', {
   'slots': {
     'STATION': 'STATIONS',
-    'RESULTS': 'AMAZON.NUMBER',
-    'OFFSET': 'AMAZON.TIME'
+    'RESULTS': 'AMAZON.NUMBER'
   },
   'utterances': ['{|Die} {-|RESULTS} {|nächsten} {|Abfahrten|Fahrten} {|von} {-|STATION}', 'nach {|Abfahrten|Fahrten} von {-|STATION}', 'nach den {-|RESULTS} nächsten {|Abfahrten|Fahrten} von {-|STATION}']
 },
@@ -167,7 +166,6 @@ app.intent('Abfahrtsmonitor', {
     //get the slot
     var stationCode = req.slot('STATION');
     var numResults  = req.slot('RESULTS');
-    var timeOffset  = req.slot('OFFSET');
     var reprompt    = 'Sage mir eine Haltestelle.';
     var result;
     cardArray       = [];
@@ -178,17 +176,13 @@ app.intent('Abfahrtsmonitor', {
         numResults = 3;
     }
 
-    if (_.isEmpty(timeOffset)) {
-        timeOffset = 0;
-    }
-
     if (_.isEmpty(stationCode)) {
       var prompt = 'Ich habe die Haltestelle nicht verstanden. Versuche es nochmal.';
       res.say(prompt).shouldEndSession(false);
       return true;
     } else {
 
-        dvb.monitor(stationCode, timeOffset, numResults).then(function (data) {
+        dvb.monitor(stationCode, 0, numResults).then(function (data) {
             console.log(data.length);
             if (data.length !== 0) {
                 var resultObject = dvbHelperInstance.getStationInfo(res, data);
