@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha test/"
   },
-  "author": "josh skeen",
+  "author": "Jeremias Arnstadt // ART-ifact",
   "license": "ISC",
   "dependencies": {
     "alexa-app": "^3.0.0",
