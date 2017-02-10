@@ -206,13 +206,13 @@ var dvbHelper = function (){
    };
 
    self.isInFuture = function(time, wantedTime) {
-       var wantedTime = moment(wantedTime);
+       var wishedTime = new moment(wantedTime);
        var departure = new Date();
        var timeArray = time.split(':');
        departure.setHours(timeArray[0],timeArray[1],0,0);
 
-       console.log(wantedTime, departure);
-      if ( wantedTime.isBefore(departure)) {
+       console.log(wantedTime, wishedTime, departure);
+      if ( wishedTime.isBefore(departure)) {
           console.log('IN FUTURE FUNCTION IS TRUE');
           return true;
       } else {
