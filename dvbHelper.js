@@ -16,8 +16,6 @@ var dvbHelper = function (){
     */
    self.getDuration = function (timeSlot){
        var currentTime = moment().add(1, 'hours').add(timeSlot, 'minutes');
-       console.log('TIMESLOT: ' +  timeSlot);
-       console.log('CURRENT TIME: ' + currentTime.toDate());
 
        return currentTime.toDate();
    };
@@ -32,7 +30,7 @@ var dvbHelper = function (){
 
        if (!_.isEmpty(timeSlot)) {
            var timeArray = timeSlot.split(':');
-           time.setHours(timeArray[0],timeArray[1] - 15,0,0);
+           time.setHours(timeArray[0],timeArray[1],0,0);
        }
        return time;
    };
@@ -203,16 +201,24 @@ var dvbHelper = function (){
        name = name.replace(/Industriegeb./g, 'Industriegebiet');
        name = name.replace(/Pennrich/g, 'Penrich');
        name = name.replace(/Reick/g, 'Reik');
+       name = name.replace(/Btf/g, 'Betriebshof');
        return name;
    };
 
+   /**
+    * checks if the given triptime is before the wanted departureTime
+    * @param  {[type]}  time       time = tripTime
+    * @param  {[type]}  wantedTime the time the user want to depart
+    * @return {Boolean}            is true if the trip is after the wanted time and false if it's before
+    */
    self.isInFuture = function(time, wantedTime) {
        var wishedTime = new moment(wantedTime);
        var departure  = new Date();
+       console.log('TIME:' + time);
        var timeArray  = time.split(':');
        departure.setHours(timeArray[0],timeArray[1],0,0);
 
-       console.log(wantedTime, wishedTime, departure);
+       console.log('WANTED TIME: '+ wantedTime, 'TRIPZEIT: ' + departure);
       if ( wishedTime.isBefore(departure)) {
           console.log('IN FUTURE FUNCTION IS TRUE');
           return true;

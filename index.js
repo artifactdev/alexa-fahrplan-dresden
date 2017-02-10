@@ -121,7 +121,7 @@ app.intent('VerbindungsauskunftMinuten', {
                     var trips = dvbHelperInstance.getTrips(tripsArray, i);
 
                     if (trips.length === 1) {
-                        resultObject = dvbHelperInstance.connectionSingleTrip(res, trips);
+                        resultObject = dvbHelperInstance.connectionSingleTrip(res, trips, duration);
                         if (resultObject !== undefined) {
                             cardArray.push(resultObject[1]);
 
@@ -131,7 +131,7 @@ app.intent('VerbindungsauskunftMinuten', {
                     } else {
                         dvbHelperInstance.resetCardArray();
                         for (var s = 0; s < trips.length; s++) {
-                            resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips);
+                            resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips, duration);
                             if (resultObject !== undefined) {
                                 res.say(resultObject[0]).send();
                                 console.log(resultObject[0]);
