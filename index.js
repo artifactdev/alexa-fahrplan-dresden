@@ -222,12 +222,11 @@ app.intent('AMAZON.HelpIntent', {
   'utterances': []
 },
   function(req, res) {
-     res.say("Du kannst zum Beispiel sagen: Die fünf nächsten Fahrten von Postplatz oder Von Postplatz nach Liststraße um 20 Uhr.").shouldEndSession(false);
+     res.say("Du kannst zum Beispiel sagen: Die fünf nächsten Fahrten von Postplatz oder von Postplatz nach Liststraße um zwanzig Uhr oder auch von Postplatz nach Liststraße in zwanzig Minuten.").shouldEndSession(false);
 });
 
 app.intent('AMAZON.StopIntent', {
   'slots': {
-
   },
   'utterances': []
 },
@@ -235,6 +234,14 @@ app.intent('AMAZON.StopIntent', {
      res.say("Ich wünsche eine gute Fahrt.");
 });
 
+app.intent('AMAZON.CancelIntent', {
+  'slots': {
+  },
+  'utterances': []
+},
+  function(req, res) {
+     res.say("Ich wünsche eine gute Fahrt.");
+});
 
 
 app.sessionEnded(function(req, res) {
