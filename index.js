@@ -61,11 +61,12 @@ app.intent('Verbindungsauskunft', {
                     } else {
                         dvbHelperInstance.resetCardArray();
                         for (var s = 0; s < trips.length; s++) {
-                            resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips, time);
-                            if (resultObject !== undefined) {
-                                res.say(resultObject[0]).send();
-                                console.log(JSON.stringify(resultObject));
-                                cardArray.push(JSON.stringify(resultObject[1]));
+                            if (dvbHelperInstance.isInFuture(trips[0].departure.time, time)) {
+                                resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips, time);
+                                if (resultObject !== undefined) {
+                                    res.say(resultObject[0]).send();
+                                    cardArray.push(JSON.stringify(resultObject[1]));
+                                }
                             }
                         }
                     }
@@ -131,11 +132,12 @@ app.intent('VerbindungsauskunftMinuten', {
                     } else {
                         dvbHelperInstance.resetCardArray();
                         for (var s = 0; s < trips.length; s++) {
-                            resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips, duration);
-                            if (resultObject !== undefined) {
-                                res.say(resultObject[0]).send();
-                                console.log(resultObject[0]);
-                                cardArray.push(resultObject[1]);
+                            if (dvbHelperInstance.isInFuture(trips[0].departure.time, duration)) {
+                                resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips, duration);
+                                if (resultObject !== undefined) {
+                                    res.say(resultObject[0]).send();
+                                    cardArray.push(resultObject[1]);
+                                }
                             }
                         }
                     }
