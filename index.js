@@ -215,6 +215,27 @@ app.intent('Abfahrtsmonitor', {
     }
 });
 
+app.intent('AMAZON.HelpIntent', {
+  'slots': {
+
+  },
+  'utterances': []
+},
+  function(req, res) {
+     res.say("Du kannst zum Beispiel sagen: Die fünf nächsten Fahrten von Postplatz oder Von Postplatz nach Liststraße um 20 Uhr.").shouldEndSession(false);
+});
+
+app.intent('AMAZON.StopIntent', {
+  'slots': {
+
+  },
+  'utterances': []
+},
+  function(req, res) {
+     res.say("Ich wünsche eine gute Fahrt.");
+});
+
+
 
 app.sessionEnded(function(req, res) {
   // cleanup the user's server-side session
