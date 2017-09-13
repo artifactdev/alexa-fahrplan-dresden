@@ -5,6 +5,7 @@ var _                 = require('lodash');
 var Alexa             = require('alexa-app');
 var dvb               = require('dvbjs');
 var moment            = require('moment');
+var waitUntil         = require('wait-until');
 var dvbHelper         = require('./dvbHelper.js');
 var app               = new Alexa.app('fahrplan-dresden');
 var dvbHelperInstance = new dvbHelper();
@@ -14,6 +15,14 @@ app.launch(function(req, res) {
   var prompt = 'Frage nach Abfahrten oder Verbindungen.';
   res.say(prompt).reprompt(prompt).shouldEndSession(false);
 });
+
+function getID(name, callback) {
+    dvb.find(name, function(err, data){
+        if (err) throw err;
+        var ID = data[0].id
+        return ID;
+    });
+};
 
 app.intent('Verbindungsauskunft', {
   'slots': {
@@ -36,10 +45,27 @@ app.intent('Verbindungsauskunft', {
       var prompt = 'Ich habe habe eine der Haltestellen nicht verstanden.';
       res.say(prompt).reprompt(reprompt).shouldEndSession(false);
       return true;
-    } else {
+    }
+
+    dvb.find(startStation, function(err, data){
+       if (err) throw err;
+       var ID = data[0].id
+       startStation = ID;
+   });
+
+   dvb.find(destinationStation, function(err, data){
+       if (err) throw err;
+       var ID = data[0].id
+       destinationStation = ID;
+   });
+
+    waitUntil(1000, 100, function condition() {
+        return ( /^\d+$/.test(destinationStation) && /^\d+$/.test(startStation) ? true : false);
+    }, function done(result) {
         var deparr = dvb.route.DEPARTURE; // set to dvb.route.DEPARTURE for the time to be the departure time, dvb.route.ARRIVAL for arrival time
 
         dvb.route(startStation, destinationStation, time, deparr).then( function(data) {
+            console.log(data);
             if (data !== null) {
                 var result       = JSON.stringify(data, null, 4);
                 var tripsArray   = JSON.parse(result);
@@ -55,7 +81,7 @@ app.intent('Verbindungsauskunft', {
                         resultObject = dvbHelperInstance.connectionSingleTrip(res, trips, time);
                         if (resultObject !== undefined) {
                             res.say(resultObject[0]).send();
-                            console.log(JSON.stringify(resultObject));
+                            console.log(JSON.stringify(resultObject[0]));
                             cardArray.push(JSON.stringify(resultObject[1]));
                         }
                     } else {
@@ -82,7 +108,8 @@ app.intent('Verbindungsauskunft', {
         });
 
       return false;
-    }
+    });
+
  }
 );
 

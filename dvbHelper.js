@@ -1,6 +1,7 @@
 /*jslint node: true */ /*global define */
 var _             = require('lodash');
 //moment = require('moment');
+var dvb           = require('dvbjs');
 moment            = require('moment-timezone');
 var cardArray     = [];
 var responseArray = [];
@@ -95,6 +96,7 @@ var dvbHelper = function (){
       };
   };
 
+
    /**
     * Creates a card
     * @param  {[event]} response   the event response
@@ -108,24 +110,40 @@ var dvbHelper = function (){
    self.connectionMultipleTrips = function (res, s, trips, time) {
        var result;
        var cardText;
-       var mode          = trips[s].mode;
+       var mode          = trips[s].mode.title;
        var line          = trips[s].line;
        var direction     = trips[s].direction;
            direction     = direction.replace(/"/g, '');
-       var departure     = trips[s].departure.stop;
-       var departureTime = trips[s].departure.time;
-       var arrival       = trips[s].arrival.stop;
-       var arrivalTime   = trips[s].arrival.time;
+       var departure,
+       departureTime,
+       departureTimeString,
+       arrival,
+       arrivalTime,
+       arrivalTimeString;
+       if (trips[s].departure) {
+            departure     = trips[s].departure.stop;
+            departureTime = new Date(trips[s].departure.time);
+            departureTimeString = departureTime.getHours() +':' + (departureTime.getMinutes()<10?'0':'') + departureTime.getMinutes();
+       } else {
+            departure     = 'Fussweg';
+       }
+       if (trips[s].arrival) {
+            arrival     = trips[s].arrival.stop;
+            arrivalTime   = new Date(trips[s].arrival.time);
+            arrivalTimeString = arrivalTime.getHours() +':' + (arrivalTime.getMinutes()<10?'0':'') + arrivalTime.getMinutes();
+       } else {
+            arrival     = 'Fussweg';
+       }
 
        if (self.isInFuture(departureTime, time)) {
-           if (s === 0) {
-               console.log(trips[s].departure.stop, trips[s].arrival.stop, "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunft an der Haltestelle " + arrival + ' um ' + arrivalTime + " Uhr.");
-               result   = "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunft an der Haltestelle " + arrival + ' um ' + arrivalTime + " Uhr.";
-               cardText = mode + ' Linie ' + line + ' Richtung ' + direction + ', ' +  departureTime + ' → ' + arrivalTime + ', ';
-           } else {
-               console.log(trips[s].departure.stop, trips[s].arrival.stop, "Danach "+ departureTime + " Uhr, weiter mit " + mode + " der Linie " + line + " Richtung " + direction + " ist die Ankunft am Ziel " + arrival + ' um ' + arrivalTime + " Uhr.");
-               result   = "Danach "+ departureTime + " Uhr, weiter mit " + mode + " der Linie " + line + " Richtung " + direction + ". Die Ankunft am Ziel " + arrival + ' ist um ' + arrivalTime + " Uhr.";
-               cardText = mode + ' Linie ' + line + ' Richtung ' + direction + ', ' +  departureTime + ' → ' + arrivalTime + ', ';
+           if (s === 0 && departure !== 'Fussweg') {
+               console.log( "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTimeString + " Uhr," + " ist die Ankunft an der Haltestelle " + arrival + ' um ' + arrivalTimeString + " Uhr.");
+               result   = "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTimeString + " Uhr," + " ist die Ankunft an der Haltestelle " + arrival + ' um ' + arrivalTimeString + " Uhr.";
+               cardText = mode + ' Linie ' + line + ' Richtung ' + direction + ', ' +  departureTimeString + ' → ' + arrivalTimeString + ', ';
+           } else if (departure !== 'Fussweg') {
+                console.log(trips[s].departure.stop, trips[s].arrival.stop, "Danach "+ departureTimeString + " Uhr, weiter mit " + mode + " der Linie " + line + " Richtung " + direction + " ist die Ankunft am Ziel " + arrival + ' um ' + arrivalTimeString + " Uhr.");
+               result   = "Danach "+ String + " Uhr, weiter mit " + mode + " der Linie " + line + " Richtung " + direction + ". Die Ankunft am Ziel " + arrival + ' ist um ' + arrivalTimeString + " Uhr.";
+               cardText = mode + ' Linie ' + line + ' Richtung ' + direction + ', ' +  departureTimeString + ' → ' + arrivalTimeString + ', ';
            }
            cardArray.push(cardText);
            return [result, cardArray];
@@ -139,14 +157,30 @@ var dvbHelper = function (){
    self.connectionSingleTrip = function (res, trips, time) {
        var result;
        var cardText;
-       var mode          = trips[0].mode;
+       var mode          = trips[0].mode.title;
        var line          = trips[0].line;
        var direction     = trips[0].direction;
            direction     = direction.replace(/"/g, '');
-       var departure     = trips[0].departure.stop;
-       var departureTime = trips[0].departure.time;
-       var arrival       = trips[0].arrival.stop;
-       var arrivalTime   = trips[0].arrival.time;
+       var departure,
+       departureTime,
+       departureTimeString,
+       arrival,
+       arrivalTime,
+       arrivalTimeString;
+       if (trips[0].departure) {
+            departure     = trips[0].departure.stop;
+            departureTime = new Date(trips[0].departure.time);
+            departureTimeString = departureTime.getHours() +':' + (departureTime.getMinutes()<10?'0':'') + departureTime.getMinutes();
+       } else {
+            departure     = 'Fussweg';
+       }
+       if (trips[0].arrival) {
+            arrival     = trips[0].arrival.stop;
+            arrivalTime   = new Date(trips[0].arrival.time);
+            arrivalTimeString = arrivalTime.getHours() +':' + (arrivalTime.getMinutes()<10?'0':'') + arrivalTime.getMinutes();
+       } else {
+            arrival     = 'Fussweg';
+       }
 
        self.resetCardArray();
 
@@ -155,9 +189,9 @@ var dvbHelper = function (){
        if (mode === "Fussweg" || !isInFuture) {
            return;
        } else {
-           console.log("Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunfszeit " + arrivalTime + " Uhr.");
-           result   = "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTime + " Uhr," + " ist die Ankunfszeit " + arrivalTime + " Uhr.";
-           cardText = mode + ' Linie ' + line + ' Richtung ' + direction + ', ' +  departureTime + ' → ' + arrivalTime + ', ';
+           console.log("Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTimeString + " Uhr," + " ist die Ankunfszeit " + arrivalTimeString + " Uhr.");
+           result   = "Mit " + mode + " der Linie " + line + " Richtung " + direction + " um " + departureTimeString + " Uhr," + " ist die Ankunfszeit " + arrivalTimeString + " Uhr.";
+           cardText = mode + ' Linie ' + line + ' Richtung ' + direction + ', ' +  departureTimeString + ' → ' + arrivalTimeString + ', ';
            cardArray.push(cardText);
            return [result, cardArray];
        }
@@ -213,17 +247,13 @@ var dvbHelper = function (){
     */
    self.isInFuture = function(time, wantedTime) {
        var wishedTime = new moment(wantedTime);
+       var timeInput = new Date(time);
        var departure  = new Date();
-       console.log('TIME:' + time);
-       var timeArray  = time.split(':');
-       departure.setHours(timeArray[0],timeArray[1],0,0);
+       departure.setHours(timeInput.getHours(),timeInput.getMinutes(),0,0);
 
-       console.log('WANTED TIME: '+ wantedTime, 'TRIPZEIT: ' + departure);
       if ( wishedTime.isBefore(departure)) {
-          console.log('IN FUTURE FUNCTION IS TRUE');
           return true;
       } else {
-          console.log('IN FUTURE FUNCTION IS FALSE');
           return false;
       }
    };

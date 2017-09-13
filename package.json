@@ -2,6 +2,10 @@
   "name": "dvb-verbindungsauskunft",
   "version": "1.0.0",
   "description": "Findet Verbindungen der DVB.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artifactdev/alexa-fahrplan-dresden.git"
+  },
   "main": "index.js",
   "scripts": {
     "test": "mocha test/"
@@ -9,14 +13,15 @@
   "author": "Jeremias Arnstadt // ART-ifact",
   "license": "ISC",
   "dependencies": {
-    "alexa-app": "^3.0.0",
+    "alexa-app": "^3.2.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
-    "dvbjs": "^4.2.1",
+    "dvbjs": "^4.3.5",
     "lodash": "^4.3.0",
     "mocha": "^2.4.5",
-    "moment": "^2.17.1",
+    "moment": "^2.18.1",
     "moment-timezone": "^0.5.11",
-    "request-promise": "^2.0.0"
+    "request-promise": "^2.0.0",
+    "wait-until": "0.0.2"
   }
 }
