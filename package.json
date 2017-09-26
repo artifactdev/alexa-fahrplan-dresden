@@ -13,10 +13,11 @@
   "author": "Jeremias Arnstadt // ART-ifact",
   "license": "ISC",
   "dependencies": {
-    "alexa-app": "^3.2.0",
+    "alexa-app": "^4.2.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
     "dvbjs": "^4.3.5",
+    "express": "^4.15.5",
     "lodash": "^4.3.0",
     "mocha": "^2.4.5",
     "moment": "^2.18.1",

@@ -2,18 +2,18 @@
 'use strict';
 module.change_code    = 1;
 var _                 = require('lodash');
-var Alexa             = require('alexa-app');
+var Alexa = require("alexa-app");
+var app               = new Alexa.app('fahrplan-dresden');
 var dvb               = require('dvbjs');
 var moment            = require('moment');
 var waitUntil         = require('wait-until');
 var dvbHelper         = require('./dvbHelper.js');
-var app               = new Alexa.app('fahrplan-dresden');
 var dvbHelperInstance = new dvbHelper();
 var cardArray         = [];
 
-app.launch(function(req, res) {
+app.launch(function(request, response) {
   var prompt = 'Frage nach Abfahrten oder Verbindungen.';
-  res.say(prompt).reprompt(prompt).shouldEndSession(false);
+  response.say(prompt).reprompt(prompt).shouldEndSession(false);
 });
 
 app.intent('Verbindungsauskunft', {
@@ -24,18 +24,18 @@ app.intent('Verbindungsauskunft', {
   },
   'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} um {-|TIME}', 'nach Verbindung von {-|STARTSTATION} nach {-|DESTINATIONSTATION} um {-|TIME}']
 },
-  function(req, res) {
+  function(request, response) {
     //get the slot
-    var timeSlot           = req.slot('TIME'); // starting at what time
+    var timeSlot           = request.slot('TIME'); // starting at what time
     var time               = dvbHelperInstance.getTime(timeSlot);
-    var startStation       = req.slot('STARTSTATION');
-    var destinationStation = req.slot('DESTINATIONSTATION');
+    var startStation       = request.slot('STARTSTATION');
+    var destinationStation = request.slot('DESTINATIONSTATION');
     var reprompt           = 'Sage mir eine Haltestelle und die Zielhaltestelle und wann es losgehen soll.';
     cardArray              = [];
 
     if (_.isEmpty(startStation) || _.isEmpty(destinationStation)) {
       var prompt = 'Ich habe habe eine der Haltestellen nicht verstanden.';
-      res.say(prompt).reprompt(reprompt).shouldEndSession(false);
+      response.say(prompt).reprompt(reprompt).shouldEndSession(false);
       return true;
     }
 
@@ -75,34 +75,37 @@ app.intent('Verbindungsauskunft', {
                     var trips = dvbHelperInstance.getTrips(tripsArray, i);
 
                     if (trips.length === 1) {
-                        resultObject = dvbHelperInstance.connectionSingleTrip(res, trips, time);
+                        resultObject = dvbHelperInstance.connectionSingleTrip(response. trips, time);
                         if (resultObject !== undefined) {
-                            res.say(resultObject[0]).send();
+                            response.say(resultObject[0]).send();
                             console.log(JSON.stringify(resultObject[0]));
                             cardArray.push(JSON.stringify(resultObject[1]));
+                            return false;
                         }
                     } else {
                         dvbHelperInstance.resetCardArray();
                         for (var s = 0; s < trips.length; s++) {
                             if (dvbHelperInstance.isInFuture(trips[0].departure.time, time)) {
-                                resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips, time);
+                                resultObject = dvbHelperInstance.connectionMultipleTrips(response. s, trips, time);
                                 if (resultObject !== undefined) {
                                     console.log(resultObject);
-                                    res.say(resultObject[0]).send();
+                                    response.say(resultObject[0]).send();
                                     cardArray.push(JSON.stringify(resultObject[1]));
+                                    return false;
                                 }
                             }
                         }
                     }
                 }
                 var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation,cardArray);
-                dvbHelperInstance.cardCreator(res, cardContent);
+                dvbHelperInstance.cardCreator(response. cardContent);
 
-                return res.say("Das war es.").shouldEndSession(true);
+                return response.say("Das war es.").shouldEndSession(true);
             } else {
                 prompt = 'Ich kann keine Ergebnisse für diese Verbindung finden.';
-                res.say(prompt).send();
+                response.say(prompt).send();
             }
+            response.send();
         });
     }
 
@@ -117,18 +120,18 @@ app.intent('VerbindungsauskunftMinuten', {
   },
   'utterances': ['{|Von} {-|STARTSTATION} {nach} {-|DESTINATIONSTATION} in {-|MINUTES} Minuten', 'nach Verbindung von {-|STARTSTATION} nach {-|DESTINATIONSTATION} in {-|MINUTES} Minuten']
 },
-  function(req, res) {
+  function(request, response) {
     //get the slot
-    var timeSlot           = req.slot('MINUTES'); // starting at what time
+    var timeSlot           = request.slot('MINUTES'); // starting at what time
     var duration           = dvbHelperInstance.getDuration(timeSlot);
-    var startStation       = req.slot('STARTSTATION');
-    var destinationStation = req.slot('DESTINATIONSTATION');
+    var startStation       = request.slot('STARTSTATION');
+    var destinationStation = request.slot('DESTINATIONSTATION');
     var reprompt           = 'Sage mir eine Haltestelle und die Zielhaltestelle und wann es losgehen soll.';
     cardArray              = [];
 
     if (_.isEmpty(startStation) || _.isEmpty(destinationStation) || _.isEmpty(timeSlot)) {
       var prompt = 'Ich habe habe nicht alles verstanden. Versuche es nochmal.';
-      res.say(prompt).reprompt(reprompt).shouldEndSession(false);
+      response.say(prompt).reprompt(reprompt).shouldEndSession(false);
       return true;
     } else {
         var deparr = dvb.route.DEPARTURE; // set to dvb.route.DEPARTURE for the time to be the departure time, dvb.route.ARRIVAL for arrival time
@@ -166,20 +169,20 @@ app.intent('VerbindungsauskunftMinuten', {
                     var trips = dvbHelperInstance.getTrips(tripsArray, i);
 
                     if (trips.length === 1) {
-                        resultObject = dvbHelperInstance.connectionSingleTrip(res, trips, duration);
+                        resultObject = dvbHelperInstance.connectionSingleTrip(response. trips, duration);
                         if (resultObject !== undefined) {
                             cardArray.push(resultObject[1]);
 
-                            res.say(resultObject[0]).send();
+                            response.say(resultObject[0]).send();
                             console.log(resultObject[0]);
                         }
                     } else {
                         dvbHelperInstance.resetCardArray();
                         for (var s = 0; s < trips.length; s++) {
                             if (dvbHelperInstance.isInFuture(trips[0].departure.time, duration)) {
-                                resultObject = dvbHelperInstance.connectionMultipleTrips(res, s, trips, duration);
+                                resultObject = dvbHelperInstance.connectionMultipleTrips(response. s, trips, duration);
                                 if (resultObject !== undefined) {
-                                    res.say(resultObject[0]).send();
+                                    response.say( resultObject[0]).send();
                                     cardArray.push(resultObject[1]);
                                 }
                             }
@@ -187,12 +190,12 @@ app.intent('VerbindungsauskunftMinuten', {
                     }
                 }
                 var cardContent = dvbHelperInstance.cardObjectHelper(startStation + ' → ' + destinationStation, cardArray);
-                dvbHelperInstance.cardCreator(res, cardContent);
+                dvbHelperInstance.cardCreator(response. cardContent);
 
-                res.say("Das war es.").shouldEndSession(true);
+                response.say("Das war es.").shouldEndSession(true);
             } else {
                 prompt = 'Ich kann keine Ergebnisse für diese Verbindung finden.';
-                res.say(prompt).send();
+                response.say(prompt).send();
             }
         });
     }
@@ -210,8 +213,8 @@ app.intent('Abfahrtsmonitor', {
 },
   function(req, res) {
     //get the slot
-    var stationCode = req.slot('STATION');
-    var numResults  = req.slot('RESULTS');
+    var stationCode = request.slot('STATION');
+    var numResults  = request.slot('RESULTS');
     var reprompt    = 'Sage mir eine Haltestelle.';
     var result;
     cardArray       = [];
@@ -224,7 +227,7 @@ app.intent('Abfahrtsmonitor', {
 
     if (_.isEmpty(stationCode)) {
       var prompt = 'Ich habe die Haltestelle nicht verstanden. Versuche es nochmal.';
-      res.say(prompt).shouldEndSession(false);
+      response.say(prompt).shouldEndSession(false);
       return true;
     } else {
 
@@ -237,7 +240,7 @@ app.intent('Abfahrtsmonitor', {
            dvb.monitor(stationID, 0, numResults).then(function (data) {
                console.log(data.length);
                if (data.length !== 0) {
-                   var resultObject = dvbHelperInstance.getStationInfo(res, data);
+                   var resultObject = dvbHelperInstance.getStationInfo(response. data);
                    setTimeout(function () {
                        console.log(resultObject[0]);
                        var result       = resultObject[0];
@@ -248,15 +251,15 @@ app.intent('Abfahrtsmonitor', {
                                resultText = resultText + result[i];
                            }
 
-                           res.say(resultText).send();
+                           response.say(resultText).send();
                            var cardContent = dvbHelperInstance.cardObjectHelper('Abfahrten ' + ' → ' + stationCode ,cardArray);
-                           dvbHelperInstance.cardCreator(res, cardContent);
+                           dvbHelperInstance.cardCreator(response. cardContent);
                        }
                    }, 500);
                } else {
                    prompt = 'Ich kann die Haltestelle nicht finden.';
                    console.log(prompt);
-                   res.say(prompt).send();
+                   response.say(prompt).send();
                }
 
            });
@@ -274,7 +277,7 @@ app.intent('AMAZON.HelpIntent', {
   'utterances': []
 },
   function(req, res) {
-     res.say("Du kannst zum Beispiel sagen: Die fünf nächsten Fahrten von Postplatz oder von Postplatz nach Liststraße um zwanzig Uhr oder auch von Postplatz nach Liststraße in zwanzig Minuten.").shouldEndSession(false);
+     response.say("Du kannst zum Beispiel sagen: Die fünf nächsten Fahrten von Postplatz oder von Postplatz nach Liststraße um zwanzig Uhr oder auch von Postplatz nach Liststraße in zwanzig Minuten.").shouldEndSession(false);
 });
 
 app.intent('AMAZON.StopIntent', {
@@ -283,7 +286,7 @@ app.intent('AMAZON.StopIntent', {
   'utterances': []
 },
   function(req, res) {
-     res.say("Ich wünsche eine gute Fahrt.");
+     response.say("Ich wünsche eine gute Fahrt.");
 });
 
 app.intent('AMAZON.CancelIntent', {
@@ -292,21 +295,22 @@ app.intent('AMAZON.CancelIntent', {
   'utterances': []
 },
   function(req, res) {
-     res.say("Ich wünsche eine gute Fahrt.");
+     response.say("Ich wünsche eine gute Fahrt.");
 });
 
 
 app.sessionEnded(function(req, res) {
   // cleanup the user's server-side session
-  res.say('Ich hoffe ich konnte helfen.');
+  response.say('Ich hoffe ich konnte helfen.');
   // no response required
 });
 
 
 app.error = function(exception, req, res) {
-    res.say("Sorry, da ist etwas schief gelaufen");
+    response.say("Sorry, da ist etwas schief gelaufen");
 };
 
 //hack to support custom utterances in utterance expansion string
 console.log(app.utterances().replace(/\{\-\|/g, '{'));
+exports.handler = app.lambda();
 module.exports = app;

@@ -110,6 +110,9 @@ var dvbHelper = function (){
    self.connectionMultipleTrips = function (res, s, trips, time) {
        var result;
        var cardText;
+       if(trips[s] !== undefined) {
+           return;
+       }
        var mode          = trips[s].mode.title;
        var line          = trips[s].line;
        var direction     = trips[s].direction;
